@@ -1,6 +1,6 @@
 # Reproducibility
 
-This repository supports artifact-level reproducibility for the thesis results. The validated result files are committed, and the validation script checks that the metrics, ground-truth graph, model-strategy sidecars, predicted matrices, and figures are internally consistent.
+This repository supports artifact-level reproducibility for the thesis results. The validated result files are committed, and the validation script checks that the metrics, ground-truth graph, model-strategy sidecars, predicted matrices, figures, and repository metadata are internally consistent.
 
 ## Dataset
 
@@ -63,16 +63,17 @@ powershell -ExecutionPolicy Bypass -File scripts\validate_results.ps1
 Python equivalent:
 
 ```powershell
-python scripts\validate_results.py
+python scripts\validate_artifacts.py
 ```
 
 The validator checks:
 
-- required result files exist;
+- required result files and repository metadata exist;
 - evaluation matrices contain the expected ten model-strategy cells;
 - required graph metrics are present;
 - the ground-truth graph contains six features and six directed edges;
 - every model-strategy cell has a JSON sidecar, predicted adjacency matrix, and graph figure;
+- every validated sidecar reports `n_runs = 1`;
 - the best F1 cell is `deepseek-r1:8b` with `Strategy_26_Skeleton_of_Thought`.
 
 ## Figure Regeneration
@@ -83,6 +84,6 @@ The committed figures can be regenerated from the result matrices:
 powershell -ExecutionPolicy Bypass -File scripts\generate_graph_recovery_figures.ps1
 ```
 
-## Full Rerun Boundary
+## Optional Experiment Rerun Boundary
 
 The notebook `notebooks/tesla_graph_recovery_llama3_deepseek.ipynb` documents the experiment source. A full rerun requires local Ollama availability and may produce different individual outputs because LLM generation is stochastic. New reruns should be stored separately and compared with the committed artifact set before replacing thesis results.

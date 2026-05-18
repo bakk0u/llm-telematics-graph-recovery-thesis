@@ -1,45 +1,59 @@
 # Prompt Decomposition Strategies for Reliable Telematics-Based Fleet Monitoring Using Llama3 and DeepSeek
 
-This repository is the current thesis repository for the graph-recovery and prompt-decomposition thesis. It is intentionally separate from the earlier thesis repository and contains only the source, data sample, configuration, scripts, and validated artifacts needed for the Tesla EV graph-recovery study.
+Bachelor thesis repository for an artifact-based evaluation of prompt decomposition strategies for LLM-assisted graph recovery from Tesla EV telemetry.
 
-## Overview
+![System pipeline](docs/system_pipeline.svg)
 
-Fleet monitoring is often relational: speed, acceleration, distance, mileage, and remaining electric energy become useful when their directed dependencies can be inspected. This thesis evaluates whether local open-source large language models can propose such directed feature graphs from Tesla EV telemetry when prompts are decomposed into structured graph-recovery tasks.
+## Project Status
 
-The experiment compares `llama3.1:8b` and `deepseek-r1:8b` across five prompting strategies. Each model output is parsed into a directed edge list, converted into a binary adjacency matrix, and evaluated against a six-edge Tesla EV reference graph. The work treats LLM outputs as graph proposals, not as validated causal discoveries.
+Current thesis version: graph recovery / prompt decomposition.
+
+This repository is intentionally separate from the earlier thesis repository and contains the LaTeX source, Tesla EV dataset copy, configuration, validated result artifacts, figures, and reproducibility scripts for the current thesis scope.
+
+The result set is fixed and artifact-based. Each validated model-strategy cell reports `n_runs = 1`, so the findings should be read as observed exploratory results rather than repeated-run estimates.
 
 ## Research Question
 
 How do prompt decomposition strategies affect the reliability of LLM-assisted graph recovery from vehicle telematics data, compared with simpler prompting baselines, when outputs are evaluated as directed adjacency matrices?
 
-## Methodology Pipeline
+## Key Findings
+
+- Best observed cell: `deepseek-r1:8b` with `Strategy_26_Skeleton_of_Thought`, with F1 = `0.5333`, precision = `0.4444`, recall = `0.6667`, and SHD = `7`.
+- Skeleton-of-thought prompting indicates the strongest decomposition result in the validated artifact set, but it still produces false positives.
+- Llama3.1 8B produces non-empty graphs in all five evaluated strategies, while DeepSeek-R1 8B has three zero-edge cells.
+- Consensus edges reveal both recurring true structure and recurring direction errors, especially speed/acceleration and mileage/distance reversals.
+- The evidence suggests that LLMs are useful as graph proposal systems, not as standalone causal-discovery systems.
+
+## Workflow
 
 ```text
 Tesla EV telemetry
   -> feature selection and dataset fingerprint
-  -> prompt template for one model-strategy cell
-  -> local Ollama generation with Llama3.1 8B or DeepSeek-R1 8B
-  -> parse allowed directed edges over six telemetry features
-  -> build predicted adjacency matrix
-  -> compare with six-edge Tesla EV reference graph
-  -> report Precision, Recall, F1, SHD, FDR, Hamming Distance, Frobenius Norm
+  -> prompt strategy
+  -> local LLM generation
+  -> directed edge parsing
+  -> predicted adjacency matrix
+  -> comparison with six-edge reference graph
+  -> Precision, Recall, F1, SHD, FDR, Hamming Distance, Frobenius Norm
 ```
 
-The selected features are `electricenergyremaining`, `electricremaining`, `speed_kmh`, `acceleration_kmh2`, `mileage`, and `distance_m`.
+## Result Visualizations
 
-## Prompting Strategies
+### Evaluation Matrix
 
-| Strategy | Role in the experiment |
-| --- | --- |
-| `Strategy_1_Zero_Shot_Prompting` | Direct graph-recovery baseline. |
-| `Strategy_23_No_Instruction_Control` | Minimal-instruction control. |
-| `Strategy_24_Policy_First_Structured` | Structured constraints before graph output. |
-| `Strategy_25_Least_to_Most` | Decomposes the graph task from simpler relations to accumulated-state relations. |
-| `Strategy_26_Skeleton_of_Thought` | Groups the graph by energy-state, driving-behavior, cross-group, and integrity checks. |
+![Evaluation matrix heatmap](figures/evaluation_matrix_tesla_ev_heatmap.png)
+
+### F1 by Model and Strategy
+
+![F1 strategy heatmap](figures/f1_strategy_vs_model_tesla_ev.png)
+
+### Ground-Truth Graph
+
+![Tesla EV ground-truth graph](figures/Ground_Truth_UC_Tesla_Energy_Consumption.png)
 
 ## Results Summary
 
-Primary result table: `results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev.csv`.
+Primary source: `results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev.csv`.
 
 | Model | Strategy | Precision | Recall | F1 | SHD | FDR | Hamming | Frobenius |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -54,49 +68,64 @@ Primary result table: `results/tesla_ev_graph_recovery/evaluation_matrix_tesla_e
 | Llama3.1 8B | Least-to-most | 0.2222 | 0.3333 | 0.2667 | 11 | 0.7778 | 0.3056 | 3.3166 |
 | Llama3.1 8B | Skeleton-of-thought | 0.2222 | 0.3333 | 0.2667 | 11 | 0.7778 | 0.3056 | 3.3166 |
 
-Best observed cell: `deepseek-r1:8b` with `Strategy_26_Skeleton_of_Thought`, with F1 = 0.5333 and recall = 0.6667. The result still has false positives, so the thesis conclusion is deliberately bounded: prompt decomposition can improve graph proposals, but the predicted graphs require explicit validation.
+## Experimental Environment
+
+| Component | Recorded value |
+| --- | --- |
+| Dataset | Tesla EV telemetry, `data/tesla.csv` |
+| Rows recorded in config | 65,261 |
+| Selected features | `electricenergyremaining`, `electricremaining`, `speed_kmh`, `acceleration_kmh2`, `mileage`, `distance_m` |
+| Runtime | Ollama local generation endpoint |
+| Models | `llama3.1:8b`, `deepseek-r1:8b` |
+| Temperature | `0.2` |
+| Top-p | `0.9` |
+| Context length | `8192` |
+| Validated runs per cell | `1` |
+
+Configuration source: `configs/graph_recovery_config.json`.
+
+## Prompting Strategies
+
+| Strategy | Role |
+| --- | --- |
+| `Strategy_1_Zero_Shot_Prompting` | Direct graph-recovery baseline. |
+| `Strategy_23_No_Instruction_Control` | Minimal-instruction control. |
+| `Strategy_24_Policy_First_Structured` | Structured constraints before graph output. |
+| `Strategy_25_Least_to_Most` | Ordered decomposition from simpler relations to accumulated-state relations. |
+| `Strategy_26_Skeleton_of_Thought` | Decomposition by energy-state, driving-behavior, cross-group, and integrity checks. |
 
 ## Repository Structure
 
 ```text
 .
-|-- main.tex                         # LaTeX thesis entry point
-|-- references.bib                   # Bibliography
-|-- chapters/                        # Thesis chapters
-|-- appendix/                        # Artifact inventory appendix
-|-- figures/                         # Figures referenced by the thesis
-|-- data/
-|   `-- tesla.csv                    # Tesla EV telemetry dataset copy used by the thesis
-|-- results/
-|   |-- README.md
-|   `-- tesla_ev_graph_recovery/     # Validated graph-recovery artifacts
-|-- notebooks/
-|   `-- tesla_graph_recovery_llama3_deepseek.ipynb
-|-- scripts/
-|   |-- generate_graph_recovery_figures.ps1
-|   |-- validate_results.ps1
-|   `-- validate_results.py
-|-- configs/
-|   `-- graph_recovery_config.json
-|-- REPRODUCIBILITY.md
-|-- requirements.txt
-|-- .gitattributes
-|-- .gitignore
+|-- .github/workflows/              # CI for LaTeX and artifact validation
+|-- appendix/                       # Thesis appendix source
+|-- chapters/                       # Thesis chapters
+|-- configs/                        # Experiment configuration
+|-- data/                           # Tesla EV telemetry dataset copy
+|-- docs/                           # Repository-level visual documentation
+|-- figures/                        # Figures referenced by README and thesis
+|-- notebooks/                      # Experiment notebook artifact
+|-- results/tesla_ev_graph_recovery # Validated graph-recovery artifacts
+|-- scripts/                        # Validation and figure-generation scripts
+|-- main.tex                        # LaTeX thesis entry point
+|-- references.bib                  # Bibliography
+|-- REPRODUCIBILITY.md              # Reproducibility guide
+|-- CITATION.cff                    # Citation metadata
+|-- LICENSE
+|-- Makefile
 `-- README.md
 ```
 
-## Compile the Thesis
+## Commands
 
-Recommended PowerShell commands on this MiKTeX setup:
+### Compile the Thesis
 
-```powershell
-& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
-& "$env:LOCALAPPDATA\Programs\MiKTeX\executables\windows-x64\biber\biber.exe" main
-& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
-& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
+```bash
+make thesis
 ```
 
-Generic LaTeX installations can use:
+Equivalent generic LaTeX commands:
 
 ```bash
 pdflatex -interaction=nonstopmode main.tex
@@ -105,51 +134,57 @@ pdflatex -interaction=nonstopmode main.tex
 pdflatex -interaction=nonstopmode main.tex
 ```
 
-Generated files such as `main.pdf`, `main.aux`, `main.bbl`, and `main.log` are build artifacts and are ignored by git.
-
-## Reproduce and Validate Results
-
-Install the analysis dependencies:
+On the Windows MiKTeX setup used for local validation:
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
+& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
+& "$env:LOCALAPPDATA\Programs\MiKTeX\executables\windows-x64\biber\biber.exe" main
+& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
+& "$env:LOCALAPPDATA\Programs\MiKTeX\miktex\bin\x64\miktex-pdftex.exe" "&pdflatex" -interaction=nonstopmode main.tex
 ```
 
-Validate the committed artifact set:
+### Validate Artifacts
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\validate_results.ps1
+```bash
+make validate
+python scripts/validate_artifacts.py
 ```
 
-Or, on systems with Python installed:
+### Regenerate Figures
 
-```powershell
-python scripts\validate_results.py
+```bash
+make figures
 ```
 
-Regenerate result figures from the validated matrices:
+PowerShell equivalent:
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\generate_graph_recovery_figures.ps1
 ```
 
-Rerunning the notebook requires a local Ollama service with `llama3.1:8b` and `deepseek-r1:8b` available. The thesis results are artifact-based: each validated model-strategy cell contains one saved output, so the repository supports traceable evaluation rather than a repeated-run statistical benchmark.
+### Clean Build Files
 
-## Dataset and Configuration
+```bash
+make clean
+```
 
-- Dataset: `data/tesla.csv`
-- Result root: `results/tesla_ev_graph_recovery/`
-- Experiment configuration: `configs/graph_recovery_config.json`
-- Runtime assumed by the experiment notebook: Ollama at `http://localhost:11434/api/generate`
-- Decoding settings recorded in config: temperature `0.2`, top-p `0.9`, context length `8192`
+## Reproducibility Boundary
+
+The repository separates three tasks:
+
+- Artifact validation: `python scripts/validate_artifacts.py`
+- Figure regeneration: `powershell -ExecutionPolicy Bypass -File scripts\generate_graph_recovery_figures.ps1`
+- Optional experiment rerun: open `notebooks/tesla_graph_recovery_llama3_deepseek.ipynb` with local Ollama models available
+
+The notebook documents the experiment source, but a full rerun can produce different individual generations. New reruns should be stored separately and compared against the committed artifact set before replacing thesis results.
 
 ## Limitations
 
-The graph reference is a physics-informed evaluation target, not an interventionally identified causal graph. The primary artifacts contain one output per model-strategy cell, so the results do not estimate stochastic variance or self-consistency. The benchmark covers one Tesla EV dataset and two local 8B-class models; broader fleet settings require additional datasets, repeated runs, and comparison with statistical graph-learning methods.
+This is an exploratory, artifact-based thesis evaluation. The observed results use one Tesla EV dataset, two local 8B-class models, five prompt strategies, and one validated output per model-strategy cell. The graph reference is physics-informed and useful for benchmarking, but it is not an interventionally identified causal graph. The results suggest that prompt decomposition can improve graph proposals in this setting; they do not establish repeated-run stability, broad generality, or standalone causal discovery.
 
 ## Citation
+
+Use the metadata in `CITATION.cff`, or cite the thesis repository as:
 
 ```bibtex
 @thesis{bakkoury2026prompt,
@@ -157,10 +192,21 @@ The graph reference is a physics-informed evaluation target, not an intervention
   author = {Bakkoury, Anas},
   school = {Constructor University},
   type   = {Bachelor Thesis},
-  year   = {2026}
+  year   = {2026},
+  url    = {https://github.com/bakk0u/llm-telematics-graph-recovery-thesis}
 }
 ```
 
-## Current Thesis Version
+## GitHub Metadata Suggestions
 
-This repository is the current graph-recovery thesis version. It deliberately excludes obsolete previous-scope artifacts and files that do not support the Tesla EV directed-graph recovery task.
+Suggested description:
+
+```text
+Bachelor thesis evaluating prompt decomposition strategies for LLM-based graph recovery from Tesla EV telemetry using local LLMs and adjacency-matrix benchmarking.
+```
+
+Suggested topics:
+
+```text
+llm, prompt-engineering, telematics, graph-recovery, ollama, deepseek, llama3, research, latex, adjacency-matrix
+```

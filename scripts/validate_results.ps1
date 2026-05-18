@@ -35,8 +35,14 @@ function Require-Path {
 }
 
 $RequiredFiles = @(
+    "README.md",
+    "REPRODUCIBILITY.md",
+    "CITATION.cff",
+    "LICENSE",
+    "docs\system_pipeline.svg",
     "data\tesla.csv",
     "configs\graph_recovery_config.json",
+    "results\tesla_ev_graph_recovery\README.md",
     "results\tesla_ev_graph_recovery\evaluation_matrix_tesla_ev.csv",
     "results\tesla_ev_graph_recovery\evaluation_matrix_tesla_ev_long.csv",
     "results\tesla_ev_graph_recovery\consensus_tesla_ev.csv",
@@ -52,6 +58,14 @@ $RequiredFiles = @(
 
 foreach ($File in $RequiredFiles) {
     Require-Path (Join-Path $Root $File)
+}
+
+$Config = Get-Content -LiteralPath (Join-Path $Root "configs\graph_recovery_config.json") -Raw | ConvertFrom-Json
+if ($Config.generation.n_runs_per_validated_cell -ne 1) {
+    throw "Expected n_runs_per_validated_cell=1 in configs\graph_recovery_config.json"
+}
+if ($Config.dataset.path -ne "data/tesla.csv") {
+    throw "Unexpected dataset path in configs\graph_recovery_config.json"
 }
 
 $Rows = Import-Csv -LiteralPath (Join-Path $Results "evaluation_matrix_tesla_ev_long.csv")
@@ -83,6 +97,11 @@ foreach ($Model in $Models.Keys) {
 $GroundTruth = Get-Content -LiteralPath (Join-Path $Results "Ground_Truth_UC_Tesla_Energy_Consumption_signed.json") -Raw | ConvertFrom-Json
 if ($GroundTruth.features.Count -ne 6 -or $GroundTruth.n_edges -ne 6) {
     throw "Ground-truth graph should contain six features and six edges"
+}
+
+$Consensus = Import-Csv -LiteralPath (Join-Path $Results "consensus_tesla_ev.csv")
+if ($Consensus.Count -ne 5) {
+    throw "Expected five consensus edges, found $($Consensus.Count)"
 }
 
 foreach ($Model in $Models.Keys) {

@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this thesis repository, please cite it using the metadata below."
+title: "llm-telematics-graph-recovery-thesis"
+authors:
+  - family-names: "Bakkoury"
+    given-names: "Anas"
+type: software
+date-released: "2026-05-12"
+repository-code: "https://github.com/bakk0u/llm-telematics-graph-recovery-thesis"
+abstract: "Bachelor thesis evaluating prompt decomposition strategies for LLM-based graph recovery from Tesla EV telemetry using local LLMs and adjacency-matrix benchmarking."
+keywords:
+  - large language models
+  - prompt engineering
+  - telematics
+  - graph recovery
+  - adjacency matrix
+  - Ollama
+  - DeepSeek
+  - Llama3
+license: MIT
+preferred-citation:
+  type: thesis
+  title: "Prompt Decomposition Strategies for Reliable Telematics-Based Fleet Monitoring Using Llama3 and DeepSeek"
+  authors:
+    - family-names: "Bakkoury"
+      given-names: "Anas"
+  year: 2026
+  institution:
+    name: "Constructor University"

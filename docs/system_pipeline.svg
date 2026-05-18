@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-labelledby="title desc">
+  <title id="title">LLM telematics graph-recovery pipeline</title>
+  <desc id="desc">Tesla telemetry flows through prompt strategy, local LLM generation, adjacency matrix construction, graph comparison, and graph-recovery metrics.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto">
+      <path d="M 0 0 L 12 6 L 0 12 z" fill="#1f4e79"/>
+    </marker>
+    <style>
+      .title { font: 700 28px Arial, sans-serif; fill: #16202b; }
+      .label { font: 700 18px Arial, sans-serif; fill: #16202b; }
+      .small { font: 400 14px Arial, sans-serif; fill: #536173; }
+      .node { fill: #f8fafc; stroke: #1f4e79; stroke-width: 3; rx: 12; }
+      .accent { fill: #fff7ed; stroke: #b8651b; stroke-width: 3; rx: 12; }
+      .line { stroke: #1f4e79; stroke-width: 3; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1400" height="420" fill="#ffffff"/>
+  <text x="700" y="54" text-anchor="middle" class="title">Prompt-to-Graph Recovery Workflow</text>
+  <text x="700" y="84" text-anchor="middle" class="small">Artifact-based thesis pipeline for Tesla EV telemetry and directed adjacency-matrix evaluation</text>
+
+  <rect x="45" y="150" width="180" height="110" class="node"/>
+  <text x="135" y="188" text-anchor="middle" class="label">Tesla telemetry</text>
+  <text x="135" y="216" text-anchor="middle" class="small">six selected EV</text>
+  <text x="135" y="236" text-anchor="middle" class="small">features</text>
+
+  <line x1="225" y1="205" x2="300" y2="205" class="line"/>
+
+  <rect x="315" y="150" width="180" height="110" class="accent"/>
+  <text x="405" y="186" text-anchor="middle" class="label">Prompt strategy</text>
+  <text x="405" y="214" text-anchor="middle" class="small">zero-shot, control,</text>
+  <text x="405" y="234" text-anchor="middle" class="small">decomposition</text>
+
+  <line x1="495" y1="205" x2="570" y2="205" class="line"/>
+
+  <rect x="585" y="150" width="180" height="110" class="node"/>
+  <text x="675" y="186" text-anchor="middle" class="label">Local LLM</text>
+  <text x="675" y="214" text-anchor="middle" class="small">Llama3.1 8B or</text>
+  <text x="675" y="234" text-anchor="middle" class="small">DeepSeek-R1 8B</text>
+
+  <line x1="765" y1="205" x2="840" y2="205" class="line"/>
+
+  <rect x="855" y="150" width="180" height="110" class="node"/>
+  <text x="945" y="186" text-anchor="middle" class="label">Adjacency matrix</text>
+  <text x="945" y="214" text-anchor="middle" class="small">parse edge list</text>
+  <text x="945" y="234" text-anchor="middle" class="small">into binary graph</text>
+
+  <line x1="1035" y1="205" x2="1110" y2="205" class="line"/>
+
+  <rect x="1125" y="150" width="180" height="110" class="accent"/>
+  <text x="1215" y="186" text-anchor="middle" class="label">Graph comparison</text>
+  <text x="1215" y="214" text-anchor="middle" class="small">against six-edge</text>
+  <text x="1215" y="234" text-anchor="middle" class="small">reference DAG</text>
+
+  <line x1="1215" y1="260" x2="1215" y2="320" class="line"/>
+
+  <rect x="1000" y="320" width="430" height="68" class="node"/>
+  <text x="1215" y="348" text-anchor="middle" class="label">Metrics</text>
+  <text x="1215" y="372" text-anchor="middle" class="small">Precision, Recall, F1, SHD, FDR, Hamming, Frobenius</text>
+
+  <text x="45" y="330" class="small">Validation boundary: committed artifacts report n_runs = 1 per model-strategy cell.</text>
+</svg>
+

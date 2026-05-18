@@ -1,0 +1,47 @@
+name: Build LaTeX thesis
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install LaTeX dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-bibtex-extra \
+            biber
+
+      - name: Compile thesis
+        run: |
+          pdflatex -interaction=nonstopmode main.tex
+          biber main
+          pdflatex -interaction=nonstopmode main.tex
+          pdflatex -interaction=nonstopmode main.tex
+
+      - name: Check LaTeX log for unresolved references
+        run: |
+          if grep -E "undefined references|Citation .* undefined|Empty bibliography" main.log; then
+            exit 1
+          fi
+
+      - name: Upload compiled PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: thesis-pdf
+          path: main.pdf
+

@@ -1,0 +1,31 @@
+name: Validate thesis artifacts
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Validate committed graph-recovery artifacts
+        run: python scripts/validate_artifacts.py
+
+      - name: Check old thesis-scope terms
+        shell: bash
+        run: |
+          if grep -RInPi "privacy leakage|\bPII\b|sensitive-field leakage|sensitive field leakage|\bPUT\b|data minimization|leakage_score|llm-privacy-thesis" . --exclude-dir=.git --exclude="*.ipynb"; then
+            exit 1
+          fi

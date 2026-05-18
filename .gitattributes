@@ -1,14 +1,22 @@
 * text=auto
 
+.gitattributes text eol=lf
+.gitignore text eol=lf
 *.tex text eol=lf
 *.bib text eol=lf
 *.md text eol=lf
 *.json text eol=lf
 *.jsonld text eol=lf
 *.csv text eol=lf
+*.cff text eol=lf
+*.py text eol=lf
+*.svg text eol=lf
+*.yml text eol=lf
 *.ipynb text eol=lf
 *.ps1 text eol=crlf
 *.txt text eol=lf
+Makefile text eol=lf
+LICENSE text eol=lf
 
 *.png binary
 *.jpeg binary

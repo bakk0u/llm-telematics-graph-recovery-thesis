@@ -3,9 +3,10 @@
 
 This chapter positions the thesis at the intersection of large language
 models, prompt decomposition, vehicle telematics analytics, and graph-based
-evaluation. Telemetry governance remains relevant because vehicle data can be
-sensitive, but the scientific focus is the evaluation of local open-source
-LLMs as graph proposal systems for directed relationship recovery.
+evaluation. Telemetry governance remains relevant because vehicle data can
+reveal operational patterns, but the scientific focus is the evaluation of
+local open-source LLMs as graph proposal systems for directed relationship
+recovery.
 
 \summarynote{Literature role}{The chapter motivates a focused graph-recovery
 study: LLMs propose directed relationships between telemetry features, prompt
@@ -113,13 +114,13 @@ in the supplied artifacts.
 
 \section{Operational Governance Context}
 
-Vehicle telemetry can expose sensitive operational patterns. This is why
-local inference, data minimization, and artifact retention remain relevant to
+Vehicle telemetry can expose operational patterns. This is why
+local inference, data scoping, and artifact retention remain relevant to
 deployment practice. Risk taxonomies for language models emphasize that
 deployment context shapes downstream harms
 \parencite{weidinger2022taxonomy,bender2021dangers}. For the present thesis,
 these issues form a governance boundary rather than a result metric:
-telematics graph-recovery systems should minimize unnecessary data exposure,
+telematics graph-recovery systems should limit unnecessary data exposure,
 preserve artifacts for audit, and avoid treating LLM-generated graphs as
 validated physical truth.
 
@@ -140,7 +141,7 @@ to adjacent research areas.
     Vehicle telematics & Monitoring, diagnostics, energy and motion signals & Uses a Tesla EV feature set as a controlled graph-recovery task. \\
     Structured-data generation & Content selection and faithful output from structured inputs & Requires strict edge-list output over an allowed feature vocabulary. \\
     Graph evaluation & Predicted structure versus reference structure & Reports adjacency-matrix metrics for every model-strategy cell. \\
-    Telemetry governance & Risk management and data minimization & Kept as operational context, not the central result metric. \\
+    Telemetry governance & Risk management and data scoping & Kept as operational context, not the central result metric. \\
     \bottomrule
   \end{tabularx}
   \caption{Positioning of the thesis relative to adjacent research areas. The contribution is a controlled evaluation of prompt decomposition for telematics graph recovery using open-source LLMs.}

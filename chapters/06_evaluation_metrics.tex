@@ -1,0 +1,157 @@
+\section{Evaluation Metrics}
+\label{sec:metrics}
+
+The evaluation compares a predicted adjacency matrix \(\hat{A}_{m,s}\) with
+the ground-truth adjacency matrix \(A^\ast\). Both matrices are binary and use
+the same six-feature ordering. A value of 1 at row \(i\), column \(j\) means
+that the source feature \(i\) has a directed relationship to the target
+feature \(j\). The supervisor notebook binarizes matrices with a threshold of
+0.5, which is equivalent to reading the saved 0/1 adjacency matrices
+directly.
+
+The metric suite contains eight values. Four metrics are edge-classification
+metrics over the flattened adjacency matrix. Four metrics summarize structural
+or matrix-level agreement. Table~\ref{tab:graph-metrics} gives the evaluation
+role of each metric.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{36mm}L{26mm}Y@{}}
+    \toprule
+    Metric & Direction & Interpretation \\
+    \midrule
+    Precision & Higher is better & Fraction of predicted edges that are present in the ground truth. \\
+    Recall & Higher is better & Fraction of ground-truth edges recovered by the model output. \\
+    F1 Score & Higher is better & Harmonic mean of precision and recall; the headline edge-recovery balance. \\
+    SHD & Lower is better & Structural Hamming distance; count of entries where predicted and ground-truth adjacency matrices differ. \\
+    FDR & Lower is better & False discovery rate; fraction of predicted edges that are false positives. \\
+    Pearson Correlation & Higher is better & Correlation between flattened predicted and ground-truth adjacency matrices, with undefined constant cases mapped to 0. \\
+    Hamming Distance & Lower is better & Fraction of flattened adjacency entries that differ. \\
+    Frobenius Norm & Lower is better & Matrix norm of the binary difference \(P-G\); numerically equal to \(\sqrt{\mathrm{SHD}}\) for binary matrices. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Graph-recovery metrics used in the supervisor-provided evaluation matrix. The suite combines edge-level classification metrics with matrix-level structural agreement measures.}
+  \label{tab:graph-metrics}
+\end{table}
+
+\subsection{Confusion Counts}
+
+Let \(\hat{A}_{ij}\) be the predicted adjacency entry for one model-strategy
+cell and \(A^\ast_{ij}\) the ground-truth entry. The flattened matrices define
+four counts:
+
+\begin{align}
+  TP &= \sum_{i,j} \mathbb{1}[\hat{A}_{ij}=1 \wedge A^\ast_{ij}=1],\\
+  FP &= \sum_{i,j} \mathbb{1}[\hat{A}_{ij}=1 \wedge A^\ast_{ij}=0],\\
+  FN &= \sum_{i,j} \mathbb{1}[\hat{A}_{ij}=0 \wedge A^\ast_{ij}=1],\\
+  TN &= \sum_{i,j} \mathbb{1}[\hat{A}_{ij}=0 \wedge A^\ast_{ij}=0].
+\end{align}
+
+These counts are computed over all matrix cells, including non-edge cells.
+Because the graph is sparse, metrics must be interpreted carefully. Accuracy
+is not reported as a headline metric because a model can obtain many true
+negatives simply by predicting few or no edges. Precision, recall, F1, and
+structural error are more informative for this task.
+
+\subsection{Precision, Recall, and F1 Score}
+
+Precision measures how many predicted edges are correct:
+
+\begin{equation}
+  \mathrm{Precision} = \frac{TP}{TP + FP}.
+\end{equation}
+
+Recall measures how many ground-truth edges are recovered:
+
+\begin{equation}
+  \mathrm{Recall} = \frac{TP}{TP + FN}.
+\end{equation}
+
+The F1 score balances precision and recall:
+
+\begin{equation}
+  \mathrm{F1} =
+  \frac{2 \cdot \mathrm{Precision} \cdot \mathrm{Recall}}
+       {\mathrm{Precision} + \mathrm{Recall}}.
+\end{equation}
+
+The notebook uses zero-division handling: if a denominator is zero, the
+corresponding score is set to 0. This matters for cells where a model produces
+no correct predicted edges or no predicted edges after parsing.
+
+\subsection{Structural Hamming Distance}
+
+Structural Hamming distance is the number of adjacency entries that differ:
+
+\begin{equation}
+  \mathrm{SHD} = \sum_{i,j} \mathbb{1}[\hat{A}_{ij} \neq A^\ast_{ij}].
+\end{equation}
+
+In this binary directed-graph setting, SHD counts both missed ground-truth
+edges and extra predicted edges. It is useful because it reports absolute
+structural error rather than only a precision-recall balance. A low SHD means
+the predicted matrix is close to the target matrix; a high SHD means many
+edge/non-edge decisions differ.
+
+\subsection{False Discovery Rate}
+
+False discovery rate is the fraction of predicted edges that are not in the
+ground truth:
+
+\begin{equation}
+  \mathrm{FDR} = \frac{FP}{TP + FP}.
+\end{equation}
+
+When no edges are predicted, the supervisor notebook sets FDR to 0. This
+convention avoids division by zero but requires careful interpretation:
+zero FDR does not necessarily indicate a useful model if recall and F1 are
+also zero.
+
+\subsection{Pearson Correlation}
+
+Pearson correlation is computed between the flattened binary predicted matrix
+and the flattened binary ground-truth matrix. It captures linear agreement
+between edge patterns. The notebook maps undefined cases to 0 when either
+flattened vector is constant or the correlation is not a number. This
+conservative fallback prevents degenerate outputs from producing undefined
+metric values.
+
+\subsection{Hamming Distance and Frobenius Norm}
+
+Hamming distance is the fraction of flattened matrix entries that differ:
+
+\begin{equation}
+  \mathrm{Hamming}(\hat{A},A^\ast) =
+  \frac{1}{n^2}\sum_{i,j}\mathbb{1}[\hat{A}_{ij} \neq A^\ast_{ij}].
+\end{equation}
+
+For the six-feature task, \(n=6\), so the denominator is 36. Hamming distance
+is therefore a normalized version of structural error.
+
+The Frobenius norm is:
+
+\begin{equation}
+  \lVert \hat{A}-A^\ast\rVert_F =
+  \sqrt{\sum_{i,j}(\hat{A}_{ij}-A^\ast_{ij})^2}.
+\end{equation}
+
+Because the matrices are binary, this value is the square root of the number
+of differing entries. It provides a matrix-error magnitude that is consistent
+with SHD while using a standard matrix norm.
+
+\section{Metric Interpretation}
+
+No single metric is sufficient. Precision can be high when a model predicts
+few edges, recall can be high when a model predicts many edges, and F1 can
+hide whether the errors are mainly false positives or false negatives. SHD,
+Hamming distance, and Frobenius norm expose total matrix error. FDR exposes
+how much of the predicted graph is spurious. Pearson correlation provides an
+additional matrix-level agreement signal.
+
+The results chapter therefore reports rankings and interpretation across the
+metric suite rather than treating one number as a universal quality score. F1
+is useful as the primary edge-recovery balance, but the thesis also examines
+false discovery and structural error because fleet-monitoring graphs can be
+misleading when they contain plausible but unsupported directed links.

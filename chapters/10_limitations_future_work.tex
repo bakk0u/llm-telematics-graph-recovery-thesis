@@ -1,0 +1,90 @@
+\section{Threats to Validity and Future Work}
+\label{sec:limitations}
+
+The thesis is intentionally bounded. It analyzes a validated set of
+supervisor-provided artifacts rather than running a larger benchmark. This
+improves auditability, but it limits the strength and generality of the
+claims.
+
+\subsection{Internal Validity}
+
+The main internal validity constraint is the single-output design. Every
+validated per-cell JSON sidecar used in the thesis reports \texttt{n\_runs =
+1}. The results therefore do not estimate stochastic output variance,
+confidence intervals, or repeated-run stability. The supervisor notebook
+contains repeated-run and self-consistency machinery, but those sections are
+not supported by the primary result files used here.
+
+Prompt sensitivity is a second internal threat. Some prompts produce useful
+graphs, some overpredict false positives, and some produce empty outputs for
+DeepSeek. The reported ranking is therefore the observed result of specific
+prompt templates, model versions, decoding settings, and parser rules, not a
+universal ordering of prompt families.
+
+\subsection{Construct Validity}
+
+The ground-truth DAG is a physics-informed evaluation target. It is not a
+formally identified causal model from interventions, randomized experiments,
+or full system identification. The thesis therefore evaluates agreement with a
+defined reference graph, not discovery of true causality in the world.
+
+The parser also shapes the construct being measured. It enforces a fixed
+feature vocabulary and arrow-based relationship syntax. A semantically useful
+relationship expressed with an unsupported variable name or prose description
+may be discarded, while a syntactically valid but conceptually weak edge is
+counted as a prediction. Future work should test parser sensitivity,
+schema-constrained generation, and JSON-only output validation.
+
+\subsection{External Validity}
+
+All primary results use one Tesla EV dataset and one six-feature graph. The
+feature set is meaningful for energy-consumption and motion analysis, but it
+does not cover all telematics variables used in fleet monitoring. Results may
+differ for combustion vehicles, hybrid vehicles, richer EV signals,
+maintenance records, GPS traces, or multi-vehicle fleet histories.
+
+The model set is also limited to two local 8B-class open-source models. The
+findings are relevant to local deployment scenarios, but they should not be
+generalized to larger closed models, fine-tuned models, or tool-augmented
+causal-discovery systems without additional experiments.
+
+\subsection{Reproducibility Constraints}
+
+The evidence is reproducible at the artifact level: the reported values can
+be traced to saved CSV, JSON, and matrix files. It is not a full rerun-based
+reproducibility study. A stronger benchmark would rerun each model-strategy
+cell multiple times under fixed decoding settings, preserve every raw output,
+and report edge probabilities alongside single-run graph metrics.
+
+Because repeated outputs are absent from the validated artifact set, the
+thesis cannot claim that self-consistency improves graph recovery. A proper
+self-consistency experiment would need multiple independent outputs for the
+same model, strategy, and dataset fingerprint, followed by a documented voting
+or aggregation rule.
+
+\subsection{Operational Governance}
+
+The thesis does not use governance risk as a primary metric, but telemetry
+governance remains relevant. A graph-recovery system may expose operational
+patterns if prompts include unnecessary raw data or if outputs are published
+without review. Future deployments should combine graph evaluation with data
+minimization, output governance, and access controls.
+
+\subsection{Future Work}
+
+The next experimental step is a repeated-run benchmark over the same Tesla EV
+task. Each model-strategy cell should be sampled multiple times, with edge
+probabilities and self-consistency voting reported separately from single-run
+metrics. A second step is cross-dataset validation: apply the same pipeline to
+additional vehicle datasets and compare whether the same prompt strategies
+remain useful.
+
+Future work should also compare LLM graph proposals with conventional
+statistical methods and expert-authored graphs. Such a comparison would
+clarify whether LLMs add useful domain priors, merely echo feature-name
+semantics, or overgenerate plausible but unsupported relationships.
+
+\summarynote{Discussion takeaway}{The current evidence is strongest as a
+controlled artifact-based comparison. It supports prompt decomposition as a
+useful but unreliable graph-recovery aid, not as a validated causal-discovery
+method.}

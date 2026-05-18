@@ -1,0 +1,162 @@
+\chapter{Literature Review}
+\label{sec:background}
+
+This chapter positions the thesis at the intersection of large language
+models, prompt decomposition, vehicle telematics analytics, and graph-based
+evaluation. Telemetry governance remains relevant because vehicle data can be
+sensitive, but the scientific focus is the evaluation of local open-source
+LLMs as graph proposal systems for directed relationship recovery.
+
+\summarynote{Literature role}{The chapter motivates a focused graph-recovery
+study: LLMs propose directed relationships between telemetry features, prompt
+decomposition is treated as an empirical design variable, and every proposed
+graph is evaluated against an explicit ground-truth adjacency matrix.}
+
+\section{LLMs as Analytical Interfaces}
+
+Large language models can adapt to tasks from natural-language context and
+structured instructions \parencite{brown2020language}. This makes them
+attractive as analytical interfaces for operational data: instead of requiring
+a user to inspect tables, scripts, or dashboards, an LLM can translate a task
+description and a compact data summary into a structured output. In this
+thesis, that output is not a prose summary but a directed edge list over
+telemetry features.
+
+This use creates a methodological tension. The model can combine feature
+semantics with broad domain knowledge, but its output is not a validated
+statistical estimate. A plausible edge may be wrong, reversed, transitive, or
+merely correlational. LLM output must therefore be treated as a hypothesis to
+be parsed and evaluated, not as an authoritative causal discovery result.
+
+\section{Vehicle Telematics Analytics}
+
+Vehicle telemetry provides structured measurements about energy state,
+movement, acceleration, cumulative usage, and distance. For fleet monitoring,
+these signals are valuable because operational decisions often depend on
+relationships between variables rather than isolated readings. Acceleration,
+speed, distance, mileage, and remaining electric energy form a compact system
+in which feature interactions matter for diagnostics and monitoring.
+
+This motivates graph-based representation. A directed graph can encode a
+candidate relationship such as acceleration influencing speed, speed
+influencing travelled distance, or driving behaviour influencing remaining
+energy. Such graphs can support inspection, knowledge-graph export, and
+downstream decision support. However, the graph remains an evaluated artifact:
+in this thesis it is compared to a predefined Tesla EV ground truth, and no
+claim is made that the LLM independently proves real-world causality.
+
+\section{Prompt Engineering and Prompt Decomposition}
+
+Prompt engineering shapes model behaviour by changing the input structure
+without changing model weights. Direct prompting states the task and output
+format. Structured prompting adds constraints, policies, decomposition, or
+answer templates. Chain-of-thought prompting demonstrated that prompting can
+change reasoning behaviour \parencite{wei2022chain}, while least-to-most
+prompting frames complex tasks as ordered sub-problems
+\parencite{zhou2023least}. These methods motivate the thesis design, although
+the thesis evaluates only final parsed outputs, not hidden reasoning traces.
+
+The evaluated prompt decomposition strategies are least-to-most prompting and
+skeleton-of-thought prompting. Least-to-most prompting asks the model to move
+from simpler physical relationships to more difficult accumulated-state
+relationships. Skeleton-of-thought prompting groups the graph into
+energy-state edges, driving-behaviour edges, cross-group edges, and an
+integrity gate. Both are compared with zero-shot, no-instruction, and
+policy-first baselines.
+
+The relevant research question is not whether these prompts make the model
+``reason'' in a human sense. The observable question is whether they improve
+the predicted adjacency matrix under fixed data, model, parser, and metric
+conditions.
+
+\section{Structured Output and Data-to-Text Context}
+
+The task also relates to structured-data generation. Natural language
+generation research studies how non-linguistic inputs are selected,
+organized, and verbalized \parencite{gatt2018survey,wiseman2017challenges}.
+This thesis uses the same concern for content selection but changes the target
+from text to graph structure. The model must select which feature
+relationships to output and express them in a strict machine-parseable format.
+
+This output-format constraint is central. The evaluator only counts edges that
+can be parsed into the allowed feature vocabulary. If the model produces
+prose, unsupported variables, or ambiguous relations, the parser may discard
+them. The evaluation therefore measures a combined capability: relationship
+proposal plus compliance with the edge-list contract.
+
+\section{Graph-Recovery Evaluation}
+
+Graph recovery can be evaluated by comparing a predicted adjacency matrix with
+a ground-truth adjacency matrix. In this thesis, each model-strategy cell
+produces a binary matrix over six Tesla EV features. The evaluation then uses
+precision, recall, F1 score, structural Hamming distance, false discovery
+rate, Pearson correlation, Hamming distance, and Frobenius norm.
+
+This metric suite is needed because graph recovery has multiple failure
+modes. A model can underpredict and miss true edges. It can overpredict and
+produce false positives. It can reverse directions, which is especially
+important in telematics because speed-to-acceleration and
+acceleration-to-speed express different structural assumptions. It can also
+output no parseable edges, yielding deceptively low false-discovery rate but
+zero useful recall.
+
+\section{Self-Consistency as Related but Unevaluated Work}
+
+Self-consistency methods typically sample multiple model outputs and aggregate
+them, for example by majority vote over answers or edge sets. The supervisor
+notebook contains repeated-run and self-consistency-style machinery, but the
+validated primary result JSON files used in this thesis report
+\texttt{n\_runs = 1}. Therefore, self-consistency is treated as related future
+work, not as an evaluated contribution. This boundary prevents the thesis from
+claiming variance estimates or repeated-run improvements that are not present
+in the supplied artifacts.
+
+\section{Operational Governance Context}
+
+Vehicle telemetry can expose sensitive operational patterns. This is why
+local inference, data minimization, and artifact retention remain relevant to
+deployment practice. Risk taxonomies for language models emphasize that
+deployment context shapes downstream harms
+\parencite{weidinger2022taxonomy,bender2021dangers}. For the present thesis,
+these issues form a governance boundary rather than a result metric:
+telematics graph-recovery systems should minimize unnecessary data exposure,
+preserve artifacts for audit, and avoid treating LLM-generated graphs as
+validated physical truth.
+
+\section{Positioning of This Thesis}
+
+Table~\ref{tab:related-positioning} summarizes the thesis position relative
+to adjacent research areas.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{35mm}Y Y@{}}
+    \toprule
+    Area & Typical emphasis & Position of this thesis \\
+    \midrule
+    LLM prompting & Instruction following, reasoning support, decomposition & Evaluates prompt strategies by their parsed graph output, not by hidden reasoning. \\
+    Vehicle telematics & Monitoring, diagnostics, energy and motion signals & Uses a Tesla EV feature set as a controlled graph-recovery task. \\
+    Structured-data generation & Content selection and faithful output from structured inputs & Requires strict edge-list output over an allowed feature vocabulary. \\
+    Graph evaluation & Predicted structure versus reference structure & Reports adjacency-matrix metrics for every model-strategy cell. \\
+    Telemetry governance & Risk management and data minimization & Kept as operational context, not the central result metric. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Positioning of the thesis relative to adjacent research areas. The contribution is a controlled evaluation of prompt decomposition for telematics graph recovery using open-source LLMs.}
+  \label{tab:related-positioning}
+\end{table}
+
+\section{Research Gap}
+
+Prior work motivates prompting, decomposition, and structured generation, but
+it does not by itself answer whether a local LLM can recover a directed
+telemetry graph when its output is forced into a parseable edge list and
+judged against a fixed reference DAG. The gap addressed here is therefore
+narrow but concrete: prompt strategies are evaluated as interventions in a
+prompt-to-graph pipeline, not as general improvements in reasoning quality.
+
+The thesis fills this gap with a controlled Tesla EV evaluation: two local
+open-source models, five prompt strategies, one six-feature ground-truth DAG,
+and eight graph-recovery metrics. The next chapters convert this positioning
+into the task definition, methodology, and results.

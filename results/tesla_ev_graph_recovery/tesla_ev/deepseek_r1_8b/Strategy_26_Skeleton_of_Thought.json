@@ -1,0 +1,66 @@
+{
+  "dataset": "tesla_ev",
+  "model": "deepseek-r1:8b",
+  "strategy": "Strategy_26_Skeleton_of_Thought",
+  "kind": "discovery",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges": [
+    [
+      "electricenergyremaining",
+      "electricremaining"
+    ],
+    [
+      "speed_kmh",
+      "acceleration_kmh2"
+    ],
+    [
+      "speed_kmh",
+      "distance_m"
+    ],
+    [
+      "acceleration_kmh2",
+      "distance_m"
+    ],
+    [
+      "speed_kmh",
+      "electricenergyremaining"
+    ],
+    [
+      "acceleration_kmh2",
+      "electricenergyremaining"
+    ],
+    [
+      "speed_kmh",
+      "electricremaining"
+    ],
+    [
+      "acceleration_kmh2",
+      "electricremaining"
+    ],
+    [
+      "distance_m",
+      "mileage"
+    ]
+  ],
+  "scores": {
+    "Precision": 0.4444,
+    "Recall": 0.6667,
+    "F1 Score": 0.5333,
+    "SHD": 7,
+    "FDR": 0.5556,
+    "Pearson Correlation": 0.4303,
+    "Hamming Distance": 0.1944,
+    "Frobenius Norm": 2.6458
+  },
+  "latency_s_total": 13.49,
+  "n_runs": 1,
+  "errors": [],
+  "raw": "electricenergyremaining -> electricremaining\nspeed_kmh -> acceleration_kmh2\nspeed_kmh -> distance_m\nacceleration_kmh2 -> distance_m\nspeed_kmh -> energy_consumption (not listed, but implied by cross-group edge)\nacceleration_kmh2 -> energy_consumption (not listed, but implied by cross-group edge)\nspeed_kmh -> electricenergyremaining\nacceleration_kmh2 -> electricenergyremaining\nspeed_kmh -> electricremaining\nacceleration_kmh2 -> electricremaining\ndistance_m -> mileage"
+}

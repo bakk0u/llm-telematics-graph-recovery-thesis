@@ -1,0 +1,65 @@
+{
+  "thesis_title": "Prompt Decomposition Strategies for Reliable Telematics-Based Fleet Monitoring Using Llama3 and DeepSeek",
+  "dataset": {
+    "name": "Tesla EV telemetry",
+    "path": "data/tesla.csv",
+    "row_count": 65261,
+    "selected_features": [
+      "electricenergyremaining",
+      "electricremaining",
+      "speed_kmh",
+      "acceleration_kmh2",
+      "mileage",
+      "distance_m"
+    ],
+    "excluded_source_fields": [
+      "timestamp",
+      "vehiclespeed"
+    ]
+  },
+  "models": [
+    {
+      "name": "llama3.1:8b",
+      "family": "Llama",
+      "size_gb": 4.9
+    },
+    {
+      "name": "deepseek-r1:8b",
+      "family": "DeepSeek",
+      "size_gb": 4.9
+    }
+  ],
+  "generation": {
+    "runtime": "Ollama",
+    "ollama_url": "http://localhost:11434/api/generate",
+    "temperature": 0.2,
+    "top_p": 0.9,
+    "num_ctx": 8192,
+    "deepseek_num_predict_override": 1024,
+    "n_runs_per_validated_cell": 1
+  },
+  "prompting_strategies": [
+    "Strategy_1_Zero_Shot_Prompting",
+    "Strategy_23_No_Instruction_Control",
+    "Strategy_24_Policy_First_Structured",
+    "Strategy_25_Least_to_Most",
+    "Strategy_26_Skeleton_of_Thought"
+  ],
+  "results": {
+    "artifact_root": "results/tesla_ev_graph_recovery",
+    "primary_matrix": "results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev.csv",
+    "long_matrix": "results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev_long.csv",
+    "ground_truth_graph": "results/tesla_ev_graph_recovery/Ground_Truth_UC_Tesla_Energy_Consumption_signed.json",
+    "ground_truth_adjacency": "results/tesla_ev_graph_recovery/Ground_Truth_UC_Tesla_Energy_Consumption_adjacency_matrix.npy"
+  },
+  "evaluation_metrics": [
+    "Precision",
+    "Recall",
+    "F1 Score",
+    "SHD",
+    "FDR",
+    "Pearson Correlation",
+    "Hamming Distance",
+    "Frobenius Norm"
+  ]
+}

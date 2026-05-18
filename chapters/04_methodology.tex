@@ -1,0 +1,179 @@
+\chapter{Methodology}
+\label{sec:methodology}
+
+\section{Overview of the Concept}
+\label{sec:research-design}
+
+The methodology evaluates LLM-assisted graph recovery as a controlled
+comparison between model choice and prompt strategy. Every model-strategy cell
+uses the same Tesla EV feature set, dataset fingerprint, ground-truth graph,
+parser, and metric suite. The independent variables are the model and the
+prompting strategy; the dependent variables are graph-recovery metrics
+computed from the predicted and reference adjacency matrices.
+
+Let \(V\) be the ordered set of six telemetry features. The ground-truth graph
+is denoted \(G^\ast=(V,E^\ast)\), where \(E^\ast\) contains the six directed
+reference edges. For a model \(m\) and strategy \(s\), the parsed LLM output is
+denoted \(\hat{G}_{m,s}=(V,\hat{E}_{m,s})\). The corresponding binary
+adjacency matrices are \(A^\ast\) and \(\hat{A}_{m,s}\), where an entry of 1
+at row \(i\), column \(j\) indicates a directed edge from feature \(i\) to
+feature \(j\). Evaluation consists of comparing \(\hat{A}_{m,s}\) with
+\(A^\ast\).
+
+The scientific object is therefore not a free-form answer quality judgment. It
+is a directed edge set. Each LLM output is reduced to relationships of the
+form \texttt{source -> target}, filtered to the six allowed feature names, and
+converted into a binary adjacency matrix. This makes it possible to report
+precision, recall, F1 score, structural Hamming distance, false discovery
+rate, Pearson correlation, Hamming distance, and Frobenius norm for every
+model-strategy combination.
+
+\summarynote{Methodology map}{The methodology begins with a normalized Tesla
+EV feature view, constructs a compact statistical fingerprint, prompts local
+LLMs to output directed edges, parses the edges into adjacency matrices, and
+evaluates those matrices against the ground-truth DAG.}
+
+\section{Prompt-to-Graph Pipeline}
+
+Figure~\ref{fig:graph-recovery-pipeline} summarizes the conceptual framework.
+The implementation is materialized in the notebook and result directory as
+\texttt{.json}, \texttt{.npy}, \texttt{.csv}, \texttt{.png}, and
+\texttt{.jsonld} artifacts.
+
+\begin{figure}[!htbp]
+  \centering
+  \begingroup
+  \newcommand{\pipelinebox}[1]{%
+    \fcolorbox{thesisline}{thesisgray}{%
+      \parbox[c][13mm][c]{0.19\textwidth}{\centering\small\bfseries #1}%
+    }%
+  }
+  \setlength{\tabcolsep}{2.5pt}
+  \begin{tabular}{@{}ccccccc@{}}
+    \pipelinebox{Telemetry\\data} &
+    \(\rightarrow\) &
+    \pipelinebox{Prompt strategy\\layer} &
+    \(\rightarrow\) &
+    \pipelinebox{LLM graph\\proposal} &
+    \(\rightarrow\) &
+    \pipelinebox{Edge\\parser} \\
+    &&&&&& \(\downarrow\) \\
+    \multicolumn{3}{c}{} &&
+    \pipelinebox{Graph-recovery\\metrics} &
+    \(\leftarrow\) &
+    \pipelinebox{Ground-truth\\comparison} \\
+    &&&&&& \(\uparrow\) \\
+    \multicolumn{5}{c}{} &&
+    \pipelinebox{Adjacency\\matrix}
+  \end{tabular}
+  \endgroup
+  \caption{Conceptual prompt-to-graph framework used in the thesis. Telemetry features are transformed into a prompted graph proposal, parsed into an adjacency matrix, and compared with the ground-truth DAG to compute graph-recovery metrics.}
+  \label{fig:graph-recovery-pipeline}
+\end{figure}
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{34mm}Y Y@{}}
+    \toprule
+    Stage & Operation & Repository trace \\
+    \midrule
+    Dataset loading & Load the normalized Tesla EV CSV and keep the configured six features. & Notebook dataset configuration; local copy at \path{data/tesla.csv}. \\
+    Fingerprinting & Summarize per-feature count, mean, standard deviation, minimum, median, maximum, and Spearman rank correlations. & \texttt{dataset\_fingerprint} in the supervisor notebook. \\
+    Prompt construction & Combine feature descriptions, dataset fingerprint, and one prompt strategy. & \texttt{make\_base\_prompt} and \texttt{STRATEGIES}. \\
+    Inference & Call local Ollama models using bounded generation settings. & \texttt{call\_ollama}; per-cell result JSON files. \\
+    Parsing & Extract directed edges from the raw LLM response and normalize feature tokens. & \texttt{parse\_causal\_edges}. \\
+    Matrix conversion & Convert parsed edges into a binary adjacency matrix using the fixed feature order. & \texttt{edges\_to\_adjacency}; saved \texttt{.npy} files. \\
+    Evaluation & Compare predicted and ground-truth matrices using eight graph metrics. & \path{evaluation_matrix_tesla_ev.csv} and \path{evaluation_matrix_tesla_ev_long.csv}. \\
+    Export & Save graph plots, edge tables, consensus edges, and JSON-LD. & \path{edges_kg.csv}, \path{edges_kg.jsonld}, and \path{consensus_tesla_ev.csv}. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Methodological pipeline and repository traceability. Each stage is tied to an artifact or function in the supervisor-provided notebook and result directory.}
+  \label{tab:graph-pipeline}
+\end{table}
+
+\section{Dataset Fingerprint}
+
+The LLM is not prompted with all 65,261 rows. Instead, the notebook constructs
+a compact textual fingerprint of the selected features. The fingerprint
+contains two parts:
+
+\begin{itemize}
+  \item per-feature descriptive statistics: count, mean, standard deviation,
+  minimum, median, and maximum, rounded for compactness;
+  \item a Spearman rank-correlation matrix over the six selected telemetry
+  features.
+\end{itemize}
+
+This design gives the model structured information about the dataset without
+placing the full table into the prompt. It also keeps the input consistent
+across strategies. Any observed difference between strategies is therefore
+attributable to instruction structure rather than different data exposure.
+
+The fingerprint is not a causal discovery algorithm. It summarizes marginal
+distributions and rank correlations. The LLM then uses that information,
+feature names, and prompt instructions to propose directed edges; direction is
+evaluated only after parsing against the ground-truth DAG.
+
+\section{Output Parsing and Matrix Construction}
+
+The parser is intentionally tolerant of common LLM formatting variation. It
+accepts ASCII arrows and related arrow glyphs, removes simple markdown or JSON
+fences, attempts to read JSON objects containing edge lists, normalizes feature
+tokens by case and punctuation, and handles chained expressions such as
+\texttt{A -> B -> C} as adjacent directed edges. It then discards any edge
+whose source or target is not one of the six allowed features.
+
+The parser output is \(\hat{E}_{m,s}\), the predicted set of directed feature
+pairs for one model-strategy cell. Duplicate edges are removed, and self-loops
+are not retained. The remaining edges are converted into \(\hat{A}_{m,s}\)
+using the fixed Tesla EV feature order:
+
+\begin{center}
+\small
+\begin{tabular}{@{}lll@{}}
+\texttt{electricenergyremaining} & \texttt{electricremaining} & \texttt{speed\_kmh} \\
+\texttt{acceleration\_kmh2} & \texttt{mileage} & \texttt{distance\_m}
+\end{tabular}
+\end{center}
+
+This parser-centered design matters because the evaluation is performed on
+matrices, not on prose. If the model gives a relationship in an unsupported
+format or uses a feature name outside the allowed set, that content cannot
+contribute to a correct edge. The thesis therefore evaluates both relational
+knowledge and compliance with the machine-readable output contract.
+
+\section{Result Artifacts Used as Source of Truth}
+
+The main methodology and results use the repository-local artifact folder:
+
+\begin{quote}
+\path{results/tesla_ev_graph_recovery}
+\end{quote}
+
+The most important files are listed in Table~\ref{tab:method-artifacts}. These
+files are used instead of rerunning the experiment, and no numerical claims
+are introduced beyond what they support.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{58mm}Y@{}}
+    \toprule
+    Artifact & Methodological role \\
+    \midrule
+    \path{Ground_Truth_UC_Tesla_Energy_Consumption_signed.json} & Documents the six-feature ground-truth graph and signed edge labels. \\
+    \path{Ground_Truth_UC_Tesla_Energy_Consumption_adjacency_matrix.npy} & Matrix target used for metric computation. \\
+    \path{tesla_ev/<model>/<strategy>.json} & Stores raw model output, parsed edges, score dictionary, latency, and \texttt{n\_runs}. \\
+    \path{tesla_ev/<model>/<strategy>.npy} & Stores the predicted adjacency matrix for a model-strategy cell. \\
+    \path{evaluation_matrix_tesla_ev.csv} & Wide evaluation table with one row per model-strategy cell and eight metric columns. \\
+    \path{evaluation_matrix_tesla_ev_long.csv} & Long-format version with explicit dataset, model, family, and strategy metadata. \\
+    \path{edges_kg.csv} and \path{edges_kg.jsonld} & Predicted edge exports for knowledge-graph style inspection. \\
+    \path{consensus_tesla_ev.csv} & Edge support table aggregating votes across evaluated model-strategy cells. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Primary artifacts used as methodological and numerical source of truth. The thesis does not report unsupported results outside these files.}
+  \label{tab:method-artifacts}
+\end{table}

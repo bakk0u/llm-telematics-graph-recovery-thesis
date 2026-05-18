@@ -1,0 +1,48 @@
+\chapter[Implementation and Reproducibility Artifacts]{Implementation and Reproducibility\\Artifacts}
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{58mm}Y@{}}
+    \toprule
+    Artifact & Role in the thesis \\
+    \midrule
+    \path{notebooks/tesla_graph_recovery_llama3_deepseek.ipynb} & Supervisor-provided notebook that defines the validated Tesla graph-recovery experiment used as the methodological source of truth. \\
+    \path{results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev.csv} & Primary model-strategy evaluation matrix containing the reported precision, recall, F1, SHD, FDR, Pearson correlation, Hamming distance, and Frobenius norm values. \\
+    \path{results/tesla_ev_graph_recovery/evaluation_matrix_tesla_ev_long.csv} & Long-form version of the evaluation matrix used for model and strategy comparisons. \\
+    \path{results/tesla_ev_graph_recovery/Ground_Truth_UC_Tesla_Energy_Consumption_signed.json} & Six-edge signed reference graph for the Tesla energy-consumption use case. \\
+    \path{results/tesla_ev_graph_recovery/Ground_Truth_UC_Tesla_Energy_Consumption_adjacency_matrix.npy} & Reference adjacency matrix used for graph-distance metrics. \\
+    \path{results/tesla_ev_graph_recovery/edges_kg.csv} & Parsed edge-level output across model-strategy cells, including true and false edge labels. \\
+    \path{results/tesla_ev_graph_recovery/consensus_tesla_ev.csv} & Consensus-edge artifact used to analyze agreement across model-strategy cells. \\
+    \path{results/tesla_ev_graph_recovery/tesla_ev/} & Per-model and per-strategy JSON sidecars, including parsed graphs, raw responses where available, and run metadata. \\
+    \path{data/tesla.csv} & Repository-local Tesla EV telemetry table used by the graph-recovery notebook. \\
+    \path{configs/graph_recovery_config.json} & Clean summary of the dataset, model, prompt-strategy, and metric configuration for this thesis repository. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Repository artifacts used to support the graph-recovery thesis. The supervisor-provided notebook and repository-local result directory are the primary source of truth.}
+  \label{tab:repo-artifacts}
+\end{table}
+
+\section{Reproducibility Boundary}
+
+The thesis does not introduce new experimental runs. Numerical claims in the
+results chapter are taken from the validated supervisor-provided artifacts in:
+
+\begin{verbatim}
+results/tesla_ev_graph_recovery/
+\end{verbatim}
+
+The per-cell JSON sidecars record \texttt{n\_runs = 1}; therefore, the thesis
+does not claim repeated-run stability, statistical significance, or validated
+self-consistency improvement. The notebook and CSV/JSON files are treated as
+fixed experimental evidence for the purpose of the written evaluation.
+
+\section{Supplementary Repository Infrastructure}
+
+This repository is the cleaned current thesis version. It retains only the
+LaTeX source, the Tesla EV data copy, graph-recovery result artifacts,
+figures, configuration summary, and figure-generation script needed to support
+the graph-recovery thesis. Graph recovery is evaluated with the metrics in
+Section~\ref{sec:metrics}; obsolete artifacts from the earlier thesis
+direction are intentionally excluded.

@@ -1,0 +1,58 @@
+{
+  "dataset": "tesla_ev",
+  "model": "llama3.1:8b",
+  "strategy": "Strategy_23_No_Instruction_Control",
+  "kind": "discovery",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges": [
+    [
+      "electricenergyremaining",
+      "electricremaining"
+    ],
+    [
+      "speed_kmh",
+      "acceleration_kmh2"
+    ],
+    [
+      "acceleration_kmh2",
+      "speed_kmh"
+    ],
+    [
+      "mileage",
+      "distance_m"
+    ],
+    [
+      "distance_m",
+      "mileage"
+    ],
+    [
+      "electricenergyremaining",
+      "mileage"
+    ],
+    [
+      "electricremaining",
+      "mileage"
+    ]
+  ],
+  "scores": {
+    "Precision": 0.2857,
+    "Recall": 0.3333,
+    "F1 Score": 0.3077,
+    "SHD": 9,
+    "FDR": 0.7143,
+    "Pearson Correlation": 0.1569,
+    "Hamming Distance": 0.25,
+    "Frobenius Norm": 3.0
+  },
+  "latency_s_total": 1.233,
+  "n_runs": 1,
+  "errors": [],
+  "raw": "electricenergyremaining -> electricremaining\nspeed_kmh -> acceleration_kmh2\nacceleration_kmh2 -> speed_kmh\nmileage -> distance_m\ndistance_m -> mileage\nelectricenergyremaining -> mileage\nelectricremaining -> mileage"
+}

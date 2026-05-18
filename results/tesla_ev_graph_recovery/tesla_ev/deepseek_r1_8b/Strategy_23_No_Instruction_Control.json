@@ -1,0 +1,66 @@
+{
+  "dataset": "tesla_ev",
+  "model": "deepseek-r1:8b",
+  "strategy": "Strategy_23_No_Instruction_Control",
+  "kind": "discovery",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges": [
+    [
+      "electricenergyremaining",
+      "electricremaining"
+    ],
+    [
+      "electricremaining",
+      "speed_kmh"
+    ],
+    [
+      "electricremaining",
+      "acceleration_kmh2"
+    ],
+    [
+      "electricremaining",
+      "distance_m"
+    ],
+    [
+      "speed_kmh",
+      "acceleration_kmh2"
+    ],
+    [
+      "speed_kmh",
+      "distance_m"
+    ],
+    [
+      "acceleration_kmh2",
+      "speed_kmh"
+    ],
+    [
+      "acceleration_kmh2",
+      "distance_m"
+    ],
+    [
+      "mileage",
+      "distance_m"
+    ]
+  ],
+  "scores": {
+    "Precision": 0.3333,
+    "Recall": 0.5,
+    "F1 Score": 0.4,
+    "SHD": 9,
+    "FDR": 0.6667,
+    "Pearson Correlation": 0.2582,
+    "Hamming Distance": 0.25,
+    "Frobenius Norm": 3.0
+  },
+  "latency_s_total": 10.314,
+  "n_runs": 1,
+  "errors": [],
+  "raw": "electricenergyremaining -> electricremaining\nelectricremaining -> speed_kmh\nelectricremaining -> acceleration_kmh2\nelectricremaining -> distance_m\nspeed_kmh -> acceleration_kmh2\nspeed_kmh -> distance_m\nacceleration_kmh2 -> speed_kmh\nacceleration_kmh2 -> distance_m\nmileage -> distance_m"
+}

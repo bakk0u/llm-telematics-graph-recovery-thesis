@@ -1,0 +1,45 @@
+{
+  "dataset": "tesla_ev",
+  "uc_name": "UC_Tesla_Energy_Consumption",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges_signed": [
+    {
+      "source": "acceleration_kmh2",
+      "target": "speed_kmh",
+      "label": "Positive (Strong)"
+    },
+    {
+      "source": "speed_kmh",
+      "target": "distance_m",
+      "label": "Positive (Strong)"
+    },
+    {
+      "source": "speed_kmh",
+      "target": "mileage",
+      "label": "Positive (Strong)"
+    },
+    {
+      "source": "speed_kmh",
+      "target": "electricenergyremaining",
+      "label": "Negative (Moderate)"
+    },
+    {
+      "source": "acceleration_kmh2",
+      "target": "electricenergyremaining",
+      "label": "Negative (Strong)"
+    },
+    {
+      "source": "electricenergyremaining",
+      "target": "electricremaining",
+      "label": "Positive (Strong)"
+    }
+  ],
+  "n_edges": 6
+}

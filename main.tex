@@ -1,0 +1,303 @@
+\documentclass[a4paper,11pt,oneside,openany]{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,top=3cm,bottom=3cm,left=3cm,right=3cm]{geometry}
+\usepackage{helvet}
+\usepackage[english]{babel}
+\usepackage{csquotes}
+\usepackage[backend=biber,style=numeric,sorting=none]{biblatex}
+\usepackage{parskip}
+\usepackage[margin=1cm]{caption}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{enumitem}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\ifdefined\pdfadjustspacing
+  \pdfadjustspacing=1
+\fi
+
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\definecolor{thesisblue}{HTML}{1F4E79}
+\definecolor{thesisaccent}{HTML}{B8651B}
+\definecolor{thesisgray}{HTML}{F3F5F7}
+\definecolor{thesisline}{HTML}{D7DEE6}
+
+\newcommand{\mylastname}{Bakkoury}
+\newcommand{\myfirstname}{Anas}
+\newcommand{\mynumber}{30007440}
+\newcommand{\myname}{\myfirstname{} \mylastname{}}
+\newcommand{\mytitle}{Prompt Decomposition Strategies for Reliable Telematics-Based Fleet Monitoring Using Llama3 and DeepSeek}
+\newcommand{\mysupervisor}{Prof. Dr.-Ing. Hendro Wicaksono}
+\newcommand{\mysubmissiondate}{12 May 2026}
+\newcommand{\constructorlogopath}{figures/constructor_logo.jpeg}
+\newcommand{\metric}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\strategy}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\summarynote}[2]{%
+  \par\smallskip
+  \noindent\begingroup
+  \setlength{\fboxsep}{7pt}%
+  \colorbox{thesisgray}{%
+    \parbox{\dimexpr\linewidth-2\fboxsep\relax}{%
+      \small\textbf{#1.} #2%
+    }%
+  }%
+  \endgroup\par\smallskip
+}
+
+\newcommand{\thesislogo}{%
+  \IfFileExists{\constructorlogopath}{%
+    \includegraphics[width=0.36\textwidth]{\constructorlogopath}%
+  }{\vspace*{18mm}}%
+}
+
+\hypersetup{
+  pdfauthor = {\myname},
+  pdftitle = {\mytitle},
+  pdfkeywords = {large language models, prompt decomposition, telematics analytics, graph recovery, fleet monitoring, causal relationship extraction},
+  colorlinks = true,
+  linkcolor = thesisblue,
+  citecolor = thesisblue,
+  urlcolor = thesisblue
+}
+
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false,skip=6pt}
+\setstretch{1.08}
+\setlength{\emergencystretch}{2em}
+\hyphenation{intelligence governance artifacts decomposition prompting behaviour telematics}
+\setlength{\textfloatsep}{16pt plus 3pt minus 3pt}
+\setlength{\floatsep}{14pt plus 3pt minus 3pt}
+\setlength{\intextsep}{14pt plus 3pt minus 3pt}
+\renewcommand{\arraystretch}{1.12}
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+\raggedbottom
+\setlist[itemize]{leftmargin=*,nosep}
+\setlist[enumerate]{leftmargin=*,nosep}
+\titleformat{\chapter}[display]
+  {\normalfont\sffamily\huge\bfseries}
+  {\color{thesisblue}\Large\chaptertitlename\ \thechapter}
+  {0.4ex}
+  {\titlerule[0.8pt]\vspace{1.2ex}}
+  [\vspace{0.8ex}\titlerule]
+\titlespacing*{\chapter}{0pt}{-12pt}{24pt}
+\titleformat{\section}
+  {\normalfont\sffamily\Large\bfseries}
+  {\thesection}
+  {0.8em}
+  {}
+\titleformat{\subsection}
+  {\normalfont\sffamily\large\bfseries}
+  {\thesubsection}
+  {0.75em}
+  {}
+\titleformat{\subsubsection}
+  {\normalfont\sffamily\normalsize\bfseries}
+  {\thesubsubsection}
+  {0.7em}
+  {}
+\titlespacing*{\section}{0pt}{2.6ex plus 0.8ex minus 0.2ex}{1.2ex}
+\titlespacing*{\subsection}{0pt}{2.0ex plus 0.6ex minus 0.2ex}{0.8ex}
+\titlespacing*{\subsubsection}{0pt}{1.4ex plus 0.5ex minus 0.2ex}{0.6ex}
+\setcounter{tocdepth}{2}
+\setcounter{secnumdepth}{3}
+
+\addbibresource{references.bib}
+
+\begin{document}
+  \pagenumbering{gobble}
+
+  \begin{titlepage}
+    \thispagestyle{empty}
+    \centering
+
+    \vspace*{8mm}
+    \thesislogo
+
+    \vspace*{34mm}
+    {\setstretch{1.12}\LARGE\bfseries \mytitle\par}
+
+    \vspace*{12mm}
+    {\large Bachelor Thesis\par}
+    \vspace*{1.5mm}
+    {\large Computer Science\par}
+
+    \vfill
+
+    \begin{tabular}{@{}>{\bfseries}L{38mm}L{78mm}@{}}
+      Author & \myname \\
+      Supervisor & \mysupervisor \\
+      Submission date & \mysubmissiondate \\
+    \end{tabular}
+
+    \vspace*{24mm}
+    {\small Constructor University\par}
+    \vspace*{1mm}
+    {\small School of Computer Science and Engineering\par}
+  \end{titlepage}
+
+  \pagenumbering{roman}
+  \thispagestyle{empty}
+
+  \chapter*{Statutory Declaration}
+  \addcontentsline{toc}{chapter}{Statutory Declaration}
+
+  \begin{center}
+    \begin{tabular}{|L{45mm}|L{85mm}|}
+      \hline
+      Family Name, Given/First Name & \mylastname, \myfirstname \\
+      Matriculation number & \mynumber \\
+      Kind of thesis submitted & Bachelor Thesis \\
+      \hline
+    \end{tabular}
+    \vspace*{8mm}
+  \end{center}
+
+  \subsection*{English: Declaration of Authorship}
+
+  I hereby declare that this thesis was created and written solely by myself
+  without unauthorized external support. Any sources, direct or indirect, are
+  marked as such. I am aware that the thesis in digital form may be reviewed
+  for unauthorized aid and plagiarism. This document has not been submitted to
+  another examination board and has not been published.
+
+  \subsection*{German: Erklaerung der Autorenschaft}
+
+  Ich erklaere hiermit, dass die vorliegende Arbeit ohne unzulaessige fremde
+  Hilfe ausschliesslich von mir erstellt und geschrieben worden ist. Alle
+  verwendeten Quellen, direkter oder indirekter Art, sind als solche kenntlich
+  gemacht. Diese Arbeit wurde keiner anderen Pruefungsbehoerde vorgelegt und
+  bisher nicht veroeffentlicht.
+
+  \vspace{20mm}
+
+  \dotfill\\
+  Date, Signature
+
+  \newpage
+
+  \chapter*{Declaration on the Use of Artificial\\ Intelligence Tools}
+  \addcontentsline{toc}{chapter}{Declaration on the Use of Artificial Intelligence Tools}
+
+  I hereby declare that artificial intelligence (AI) tools were used during the
+  preparation of this thesis in a limited and transparent supporting role.
+  Their use was confined to language refinement, code-related assistance,
+  debugging support, and workflow improvements. All AI-assisted outputs were
+  critically reviewed, verified, and edited by me to ensure correctness,
+  academic integrity, and alignment with the objectives of this research.
+
+  The research design, experimental setup, analysis, interpretation of results,
+  and conclusions presented in this thesis are my own intellectual
+  contributions.
+
+  \begin{table}[H]
+    \centering
+    \caption*{AI tools used during thesis preparation}
+    \label{tab:ai_tools_declaration}
+    \begin{tabularx}{\textwidth}{@{}L{0.27\textwidth}Y@{}}
+      \toprule
+      \textbf{AI Tool} & \textbf{Purpose of Use} \\
+      \midrule
+      ChatGPT 5.5 &
+      Used to support language refinement, grammar improvement, academic
+      phrasing, structural feedback, and clarification of technical
+      explanations. \\
+      Grammarly Pro &
+      Used for grammar checking, spelling correction, punctuation improvement,
+      and readability enhancement. \\
+      DeepL Translator &
+      Used for limited translation support and language refinement between
+      English and German where necessary. \\
+      Claude Sonnet 4.6 &
+      Used to support implementation work, code refinement, debugging
+      suggestions, and software engineering workflow improvements. \\
+      \bottomrule
+    \end{tabularx}
+  \end{table}
+
+  No AI system was used to fabricate experimental results, falsify data,
+  generate unverified findings, or produce conclusions presented as original
+  scientific contributions without human verification.
+
+  I take full responsibility for the accuracy, integrity, and originality of all
+  content contained in this thesis.
+
+  \newpage
+
+  \chapter*{Abstract}
+  \addcontentsline{toc}{chapter}{Abstract}
+
+  Fleet monitoring increasingly depends on vehicle telemetry whose meaning is
+  relational rather than purely descriptive: energy state, speed,
+  acceleration, mileage, and distance become operationally useful when their
+  directed dependencies are made explicit. This thesis evaluates whether local
+  open-source large language models can support this task by proposing
+  directed feature graphs from a normalized Tesla electric-vehicle telemetry
+  dataset.
+
+  The study treats prompt decomposition as the central experimental variable.
+  Five strategies are compared: zero-shot prompting, a no-instruction control,
+  policy-first structured prompting, least-to-most decomposition, and
+  skeleton-of-thought prompting. Two local Ollama models,
+  \texttt{llama3.1:8b} and \texttt{deepseek-r1:8b}, generate edge lists over
+  six features: \texttt{electricenergyremaining},
+  \texttt{electricremaining}, \texttt{speed\_kmh},
+  \texttt{acceleration\_kmh2}, \texttt{mileage}, and \texttt{distance\_m}.
+  Each output is parsed into a binary adjacency matrix and evaluated against a
+  six-edge Tesla energy-consumption ground-truth DAG using precision, recall,
+  F1 score, structural Hamming distance, false discovery rate, Pearson
+  correlation, Hamming distance, and Frobenius norm.
+
+  The strongest observed model-strategy cell is \texttt{deepseek-r1:8b} with
+  \texttt{Strategy\_26} (Skeleton-of-Thought), achieving precision
+  \(0.4444\), recall \(0.6667\), F1 score \(0.5333\), structural Hamming
+  distance \(7\), and Pearson correlation \(0.4303\). The next-best F1 score
+  is \(0.4000\), observed for \texttt{llama3.1:8b} with zero-shot prompting
+  and for \texttt{deepseek-r1:8b} with the no-instruction control. The results
+  are descriptive because each validated model-strategy cell contains one
+  output. They do not establish formal causal discovery, statistical
+  significance, or repeated-run self-consistency. Within that evidence, the
+  thesis shows that decomposition-style prompting can improve LLM-assisted
+  graph recovery in a controlled Tesla EV setting, while still requiring
+  explicit safeguards against false positives and direction errors.
+
+  \newpage
+  \tableofcontents
+
+  \clearpage
+  \pagenumbering{arabic}
+
+  \input{chapters/01_introduction}
+  \input{chapters/02_background_related_work}
+  \input{chapters/03_vehicle_telematics_and_task_definition}
+  \input{chapters/04_methodology}
+  \input{chapters/05_prompting_strategies}
+  \input{chapters/06_evaluation_metrics}
+  \input{chapters/07_experimental_setup}
+  \input{chapters/08_results}
+  \input{chapters/09_discussion}
+  \input{chapters/10_limitations_future_work}
+  \input{chapters/11_conclusion}
+
+  \clearpage
+  \printbibliography
+
+  \clearpage
+  \appendix
+  \input{appendix/a_repository_artifacts}
+
+\end{document}

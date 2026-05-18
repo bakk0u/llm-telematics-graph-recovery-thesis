@@ -1,0 +1,137 @@
+\section{Experimental Setup}
+\label{sec:experimental-setup}
+
+The primary experiment is the supervisor-provided Tesla EV graph-recovery run
+stored under \path{results/tesla_ev_graph_recovery}. The thesis analyzes the
+saved experimental evidence rather than introducing a new benchmark run.
+
+\subsection{Models}
+
+The evaluated models are local Ollama models:
+\texttt{deepseek-r1:8b} and \texttt{llama3.1:8b}. The supervisor notebook
+records both as 4.9 GB models and labels their families as DeepSeek and Llama,
+respectively. Table~\ref{tab:graph-models} summarizes the model configuration
+used in the primary result matrix.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{32mm}L{24mm}L{22mm}Y@{}}
+    \toprule
+    Model & Family & Size in result CSV & Role in comparison \\
+    \midrule
+    \texttt{deepseek-r1:8b} & DeepSeek & 4.9 GB & Reasoning-oriented open-source model evaluated for structured graph recovery. \\
+    \texttt{llama3.1:8b} & Llama & 4.9 GB & Same-size open-source baseline model for comparison. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Models evaluated in the supervisor-provided Tesla EV result matrix. The size and family fields are taken from the long-format evaluation CSV.}
+  \label{tab:graph-models}
+\end{table}
+
+The notebook calls Ollama through \path{/api/generate}. It sets temperature to
+0.2, top-\(p\) to 0.9, and context length to 8192 in the notebook
+configuration. It also defines a per-model output-token cap for
+\texttt{deepseek-r1:8b} to prevent reasoning traces from running without a
+known bound. These settings are documented as part of the supervisor notebook;
+the result artifacts, rather than a new run, are the numerical source of
+truth.
+
+\subsection{Dataset and Run Grid}
+
+The active dataset list contains one dataset:
+\texttt{tesla\_ev}, labeled \emph{Tesla Full EV}. The active model list
+contains two models. The validated result matrix contains five strategies.
+Therefore, the primary evaluation matrix has ten rows:
+
+\begin{equation}
+  1 \text{ dataset} \times 2 \text{ models} \times 5 \text{ strategies}
+  = 10 \text{ model-strategy cells}.
+\end{equation}
+
+Each cell is represented by one predicted adjacency matrix in the result
+directory. The JSON sidecars report \texttt{n\_runs = 1}. The folder name
+contains \texttt{10x}, and the notebook includes repeated-run code, but the
+validated primary files used for this thesis do not provide repeated-run
+metric rows. The methodology therefore treats the experiment as a
+single-output-per-cell comparison.
+
+\begin{table}[!htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{45mm}Y@{}}
+    \toprule
+    Configuration item & Value used in primary thesis evidence \\
+    \midrule
+    Dataset key & \texttt{tesla\_ev} \\
+    Dataset label & Tesla Full EV \\
+    Use-case name & \texttt{UC\_Tesla\_Energy\_Consumption} \\
+    Selected features & Six: \texttt{electricenergyremaining}, \texttt{electricremaining}, \texttt{speed\_kmh}, \texttt{acceleration\_kmh2}, \texttt{mileage}, \texttt{distance\_m} \\
+    Models & \texttt{deepseek-r1:8b}, \texttt{llama3.1:8b} \\
+    Strategies in primary results & Five \\
+    Evaluation rows & Ten model-strategy cells \\
+    Per-cell repetitions in JSON sidecars & \texttt{n\_runs = 1} \\
+    Primary result table & \path{evaluation_matrix_tesla_ev_long.csv} \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Primary experimental configuration used in the thesis. The table intentionally avoids unsupported repeated-run claims.}
+  \label{tab:primary-experiment-config}
+\end{table}
+
+\subsection{Saved Per-Cell Artifacts}
+
+For each evaluated model-strategy cell, the result directory contains three
+main artifacts:
+
+\begin{itemize}
+  \item a \texttt{.json} sidecar with the dataset key, model, strategy, feature
+  list, parsed edges, metric scores, total latency, \texttt{n\_runs}, errors,
+  and raw model text;
+  \item a \texttt{.npy} file storing the predicted adjacency matrix used by the
+  evaluation builder;
+  \item a \texttt{.png} graph visualization of the predicted edge set.
+\end{itemize}
+
+The result directory also contains aggregate artifacts: the full evaluation
+matrix, a long-format evaluation table, per-model and F1 heatmaps, a long edge
+export, a JSON-LD edge export, and a consensus edge table. These artifacts
+allow the results chapter to move between numerical ranking, qualitative edge
+inspection, and consensus analysis without recomputing generations.
+
+\subsection{Reproducibility Boundary}
+
+The reproducibility standard is artifact traceability rather than experiment
+rerun. Every numerical claim in the methodology and results must be traceable
+to one of the following:
+
+\begin{itemize}
+  \item \path{evaluation_matrix_tesla_ev.csv};
+  \item \path{evaluation_matrix_tesla_ev_long.csv};
+  \item per-cell result JSON files under \path{tesla_ev/<model>/<strategy>.json};
+  \item \path{Ground_Truth_UC_Tesla_Energy_Consumption_signed.json};
+  \item \path{edges_kg.csv};
+  \item \path{consensus_tesla_ev.csv}.
+\end{itemize}
+
+This boundary prevents the thesis from importing claims from commented
+notebook cells, unexecuted repeated-run sections, or the older summarization
+and governance-oriented experiment. The graph-recovery artifacts are primary;
+previous repository infrastructure is supplementary.
+
+\subsection{Known Methodological Limitations}
+
+The experimental setup has several limitations that affect interpretation.
+First, the evaluation uses one Tesla EV dataset and one six-feature graph, so
+the result is not a general benchmark for all vehicle systems. Second, the
+ground-truth graph is physics-informed and suitable for evaluation, but it is
+not a formally identified causal model from interventions. Third, the
+validated artifacts provide one output per model-strategy cell, so output
+variance and self-consistency cannot be quantified from the primary evidence.
+Fourth, the parser enforces a strict feature vocabulary; useful but
+out-of-vocabulary prose does not become a correct edge.
+
+These limitations do not invalidate the comparison. They define its scope:
+the thesis evaluates prompt decomposition and instruction structure as
+practical methods for improving LLM-assisted telematics graph recovery in a
+controlled, auditable Tesla EV setting.

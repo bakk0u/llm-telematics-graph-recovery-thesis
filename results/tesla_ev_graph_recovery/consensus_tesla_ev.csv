@@ -1,0 +1,6 @@
+source,target,votes,support
+electricenergyremaining,electricremaining,7,0.7
+speed_kmh,acceleration_kmh2,7,0.7
+mileage,distance_m,6,0.6
+acceleration_kmh2,speed_kmh,5,0.5
+distance_m,mileage,5,0.5

@@ -1,0 +1,128 @@
+\section{Prompt Strategy Design}
+\label{sec:prompting}
+
+Prompting is the experimental intervention. The dataset, feature set,
+fingerprint, parser, ground truth, and metric suite remain fixed while the
+instruction wrapper changes. The supervisor notebook originally contains a
+larger strategy registry, but the validated primary results used in this
+thesis contain five active strategies. Those five strategies are listed in
+Table~\ref{tab:graph-prompting-strategies}.
+
+\begin{table}[!htbp]
+  \centering
+  \scriptsize
+  \setlength{\tabcolsep}{3pt}
+  \begin{tabularx}{\textwidth}{@{}L{46mm}L{27mm}Y@{}}
+    \toprule
+    Strategy & Strategy role & Methodological purpose \\
+    \midrule
+    \shortstack[l]{\texttt{Strategy\_1}\\\texttt{Zero\_Shot\_Prompting}} & Zero-shot baseline & Uses the common base prompt without additional methodological framing. \\
+    \shortstack[l]{\texttt{Strategy\_23}\\\texttt{No\_Instruction\_Control}} & Control baseline & Represents a neutral discovery instruction with no added causal-discovery policy beyond the base task. \\
+    \shortstack[l]{\texttt{Strategy\_24}\\\texttt{Policy\_First\_Structured}} & Instruction structuring & Places explicit causal-discovery rules before the base task. \\
+    \shortstack[l]{\texttt{Strategy\_25}\\\texttt{Least\_to\_Most}} & Prompt decomposition & Breaks graph recovery into ordered internal sub-problems from simpler physical links to more difficult accumulated-state links. \\
+    \shortstack[l]{\texttt{Strategy\_26}\\\texttt{Skeleton\_of\_Thought}} & Prompt decomposition & Provides an internal answer skeleton covering energy-state edges, driving-behaviour edges, cross-group edges, and an integrity gate. \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Prompt strategies evaluated in the supervisor-provided Tesla EV results. The table uses the exact strategy names stored in the result CSV and JSON files.}
+  \label{tab:graph-prompting-strategies}
+\end{table}
+
+\section{Common Base Prompt}
+
+All evaluated strategies share a common graph-recovery scaffold. The base
+prompt identifies the dataset as Tesla Full EV telematics, lists the six
+features and their descriptions, supplies the dataset fingerprint, and asks
+the model to identify directed feature relationships in the format
+\texttt{feature\_a -> feature\_b}. The prompt explicitly requests one
+relationship per line and no prose, numbering, or markdown. This output
+contract is necessary because the downstream evaluator expects parseable
+directed edges.
+
+The base prompt is already a constrained analytics prompt. Therefore, the
+comparison should not be interpreted as free-form language generation versus
+structured generation. It is a comparison between different degrees and kinds
+of instruction structure layered onto the same graph-recovery task.
+
+\section{Baselines and Controls}
+
+\subsection{Zero-Shot Prompting}
+
+\strategy{Strategy_1_Zero_Shot_Prompting} applies the common base prompt
+directly. It is called zero-shot because it provides no examples of correct
+edges and no additional decomposition beyond the task instruction. It measures
+how much graph-recovery performance the model can achieve from feature
+semantics, dataset statistics, and the base output contract alone.
+
+\subsection{No-Instruction Control}
+
+\strategy{Strategy_23_No_Instruction_Control} is a neutral control condition.
+In the active supervisor configuration, it also uses the base discovery prompt
+without an added policy or decomposition layer. Its role is to provide an
+additional control point for the adapted strategy set. Because it is close to
+the zero-shot condition, differences between these two rows should be
+interpreted conservatively and through the saved artifacts rather than treated
+as evidence of a fundamentally different method.
+
+\section{Instruction Structuring}
+
+\strategy{Strategy_24_Policy_First_Structured} places a numbered
+causal-discovery policy before the base task. The policy instructs the model
+to report only direct relationships, reject correlation-only or co-movement
+links, avoid bidirectional edges unless independently physically justified,
+and keep the output to one ASCII-arrow edge per line.
+
+The intended mechanism is constraint salience. By putting methodological rules
+before the dataset description and task, the prompt attempts to make
+directness, interventionability, and output format part of the task frame.
+This is different from prompt decomposition: the policy-first prompt does not
+split the task into stages, but it does make the evaluation criteria explicit
+before generation.
+
+\section{Prompt Decomposition}
+
+Prompt decomposition strategies ask the model to organize the graph-recovery
+problem into internal sub-tasks before producing the final edge list. In this
+thesis, decomposition is evaluated through least-to-most prompting and
+skeleton-of-thought prompting. The implementation requests only the final
+edges, so the thesis evaluates observable output rather than hidden reasoning.
+
+\subsection{Least-to-Most Prompting}
+
+\strategy{Strategy_25_Least_to_Most} decomposes the graph-recovery problem
+from simpler to more difficult sub-problems. The prompt asks the model to:
+identify obvious physical edges, add edges supported by a physical law, add
+edges involving accumulated state such as mileage or degradation, remove
+correlation-only or mediated links, and output only the surviving final edges.
+
+This strategy is relevant to telematics because vehicle-system relationships
+are not all equally difficult. Some relationships, such as acceleration and
+speed, are direct and physically familiar. Others, such as the relation
+between driving behaviour and remaining energy, require integration across
+energy and motion features. Least-to-most prompting tests whether an ordered
+reasoning scaffold improves graph recovery compared with simpler baselines.
+
+\subsection{Skeleton-of-Thought Prompting}
+
+\strategy{Strategy_26_Skeleton_of_Thought} provides an internal answer
+skeleton. The skeleton separates the candidate graph into energy-state edges,
+driving-behaviour edges, cross-group edges, and an integrity gate that checks
+for directness, correlation-only links, and invalid bidirectionality. The
+model is then instructed to output only the merged final list of edges.
+
+This strategy is more structured than least-to-most prompting because it
+groups the feature graph by subsystem. In the Tesla EV task, this grouping is
+natural: energy-related variables and driving-behaviour variables are
+distinct, but the graph also contains cross-group relationships from speed and
+acceleration to remaining energy. The strategy tests whether such an explicit
+skeleton helps the model cover the graph without losing the output-format
+constraint.
+
+\section{Prompting Methods Outside the Primary Evidence}
+
+The supervisor notebook contains commented or auxiliary strategy definitions,
+including self-consistency and repeated-run machinery. Those definitions are
+not treated as primary evaluated methods here because the JSON sidecars in the
+validated result directory report \texttt{n\_runs = 1} for the model-strategy
+cells used in the thesis. The thesis therefore does not claim measured
+self-consistency improvements. It focuses on the five prompt strategies that
+appear in \path{evaluation_matrix_tesla_ev_long.csv}.

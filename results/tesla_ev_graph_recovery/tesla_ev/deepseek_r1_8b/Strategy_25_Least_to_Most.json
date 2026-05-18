@@ -1,0 +1,29 @@
+{
+  "dataset": "tesla_ev",
+  "model": "deepseek-r1:8b",
+  "strategy": "Strategy_25_Least_to_Most",
+  "kind": "discovery",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges": [],
+  "scores": {
+    "Precision": 0.0,
+    "Recall": 0.0,
+    "F1 Score": 0.0,
+    "SHD": 6,
+    "FDR": 0.0,
+    "Pearson Correlation": 0.0,
+    "Hamming Distance": 0.1667,
+    "Frobenius Norm": 2.4495
+  },
+  "latency_s_total": 26.878,
+  "n_runs": 1,
+  "errors": [],
+  "raw": ""
+}

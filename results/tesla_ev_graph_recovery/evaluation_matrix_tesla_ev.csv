@@ -1,0 +1,11 @@
+row_label,Precision,Recall,F1 Score,SHD,FDR,Pearson Correlation,Hamming Distance,Frobenius Norm
+deepseek-r1:8b_Strategy_1_Zero_Shot_Prompting,0.0,0.0,0.0,6,0.0,0.0,0.1667,2.4495
+deepseek-r1:8b_Strategy_23_No_Instruction_Control,0.3333,0.5,0.4,9,0.6667,0.2582,0.25,3.0
+deepseek-r1:8b_Strategy_24_Policy_First_Structured,0.0,0.0,0.0,6,0.0,0.0,0.1667,2.4495
+deepseek-r1:8b_Strategy_25_Least_to_Most,0.0,0.0,0.0,6,0.0,0.0,0.1667,2.4495
+deepseek-r1:8b_Strategy_26_Skeleton_of_Thought,0.4444,0.6667,0.5333,7,0.5556,0.4303,0.1944,2.6458
+llama3.1:8b_Strategy_1_Zero_Shot_Prompting,0.3333,0.5,0.4,9,0.6667,0.2582,0.25,3.0
+llama3.1:8b_Strategy_23_No_Instruction_Control,0.2857,0.3333,0.3077,9,0.7143,0.1569,0.25,3.0
+llama3.1:8b_Strategy_24_Policy_First_Structured,0.1667,0.1667,0.1667,10,0.8333,0.0,0.2778,3.1623
+llama3.1:8b_Strategy_25_Least_to_Most,0.2222,0.3333,0.2667,11,0.7778,0.0861,0.3056,3.3166
+llama3.1:8b_Strategy_26_Skeleton_of_Thought,0.2222,0.3333,0.2667,11,0.7778,0.0861,0.3056,3.3166

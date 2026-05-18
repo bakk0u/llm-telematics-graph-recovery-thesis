@@ -1,0 +1,60 @@
+\chapter{Conclusion}
+\label{sec:conclusion}
+
+This thesis evaluated prompt decomposition strategies for telematics-based
+fleet monitoring using two local open-source LLMs:
+\texttt{llama3.1:8b} and \texttt{deepseek-r1:8b}. The central task was graph
+recovery from Tesla EV telemetry. Each model-strategy output was parsed into
+directed feature edges, converted into an adjacency matrix, and compared with
+a six-edge physics-informed Tesla EV ground-truth graph.
+
+The contribution is a controlled, artifact-traceable evaluation rather than a
+claim of autonomous causal discovery. Five prompt strategies were compared:
+zero-shot prompting, no-instruction control, policy-first structured
+prompting, least-to-most prompting, and skeleton-of-thought prompting.
+Performance was reported with precision, recall, F1 score, SHD, FDR, Pearson
+correlation, Hamming distance, and Frobenius norm.
+
+The strongest observed result is \texttt{deepseek-r1:8b} with
+skeleton-of-thought prompting. This configuration achieves precision 0.4444,
+recall 0.6667, F1 score 0.5333, SHD 7, FDR 0.5556, Pearson correlation
+0.4303, Hamming distance 0.1944, and Frobenius norm 2.6458. It recovers four
+of the six ground-truth edges but also predicts five false positive edges.
+This is the clearest evidence that decomposition can help in the evaluated
+Tesla EV setting, but it is not reliable enough to be treated as validated
+causal knowledge.
+
+The broader results show model-specific trade-offs. Llama has higher average
+F1 across strategies, but it also produces a higher average false discovery
+rate and more structural error. DeepSeek produces the best single graph, but
+three of its validated strategy cells contain empty outputs and zero parsed
+edges. Strategy effects are also mixed. Skeleton-of-thought is the strongest
+decomposition strategy in the supplied results; least-to-most prompting does
+not improve the evaluated graph recovery. Policy-first instruction structuring
+is not sufficient on its own.
+
+The consensus graph reinforces the need for evaluation. It captures correct
+recurring edges such as \texttt{electricenergyremaining -> electricremaining},
+but it also preserves recurring false edges such as
+\texttt{speed\_kmh -> acceleration\_kmh2} and mileage-distance reversals.
+Agreement across prompts and models can therefore reflect shared mistakes,
+not only shared knowledge.
+
+The final claim is precise. Prompt decomposition can improve
+LLM-assisted telematics graph recovery in this controlled Tesla EV setting,
+especially when the prompt structure matches the feature-system structure.
+However, the evaluated LLMs remain sensitive to prompt wording, output format,
+parser behavior, and model-specific generation patterns. The thesis does not
+demonstrate true causal discovery, repeated-run self-consistency, or general
+reliability across vehicle datasets.
+
+For fleet-monitoring research, the durable contribution is an auditable
+evaluation discipline for LLM-assisted telemetry analytics. A responsible
+workflow should define the feature set, constrain the model to produce a
+parseable graph, convert the proposal into an adjacency matrix, compare it
+with explicit domain knowledge, and inspect false positives and direction
+errors before operational use. Under this discipline, LLMs are best understood
+as structured graph proposal systems: useful because they can surface
+candidate relationships, limited because those proposals require validation,
+and accountable only when human reviewers retain final responsibility for the
+interpretation and use of the graph.

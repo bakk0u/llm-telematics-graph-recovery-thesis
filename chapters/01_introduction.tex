@@ -1,0 +1,161 @@
+\chapter{Introduction}
+\label{sec:introduction}
+
+\section{Problem and Motivation}
+
+Modern fleet monitoring depends on telemetry streams that describe vehicle
+state, motion, energy availability, and accumulated usage. In electric
+vehicles, measurements such as remaining energy, remaining range proxy, speed,
+acceleration, mileage, and travelled distance are not independent facts. Their
+operational meaning depends on how they relate: acceleration changes speed,
+speed contributes to distance, driving behaviour affects energy consumption,
+and remaining energy constrains how a vehicle can be interpreted in a fleet
+context.
+
+This relational structure makes graph-based telemetry analysis attractive. A
+directed graph can encode proposed dependencies between telemetry features,
+while an adjacency matrix makes those dependencies measurable and comparable.
+Such representations can support inspection, diagnostics, knowledge-graph
+construction, and downstream decision support. They are also difficult to
+obtain automatically. Classical causal discovery requires assumptions about
+data-generating processes, sufficient observations, and domain validation.
+Manual graph construction by experts is more interpretable, but it is costly
+and does not scale easily across vehicle systems, datasets, and use cases.
+
+Large language models (LLMs) offer a different kind of support. Rather than
+estimating a causal model directly from raw data, an LLM can be asked to
+propose a compact directed graph from feature descriptions, domain semantics,
+and a statistical fingerprint of the dataset. This should not be confused with
+formal causal discovery. In this thesis, the LLM is used as a graph proposal
+component: it emits candidate directed edges, the system parses those edges
+into an adjacency matrix, and the result is evaluated against an explicit
+ground-truth DAG. The scientific question is whether prompt design makes this
+proposal process more reliable.
+
+Prompt design is a meaningful research variable because graph recovery
+requires more than naming related variables. A model must distinguish direct
+from mediated relations, avoid bidirectional or transitive edges unless they
+are justified, respect the allowed feature vocabulary, and output a
+machine-parseable edge list. Unstructured prompts may produce plausible
+correlations, reversed directions, prose explanations, or extra variables.
+Structured prompts and prompt decomposition can instead make the model attend
+to physical directness, subsystem grouping, and final output constraints.
+
+In this thesis, \emph{prompt decomposition} refers to strategies that divide
+the graph-recovery task into smaller internal stages before the final edge
+list is produced. The decomposition-oriented strategies are
+\texttt{Strategy\_25} (Least-to-Most) and \texttt{Strategy\_26}
+(Skeleton-of-Thought). They are compared with \texttt{Strategy\_1}
+(Zero-Shot Prompting), \texttt{Strategy\_23} (No-Instruction Control), and
+\texttt{Strategy\_24} (Policy-First Structured).
+
+The empirical setting is deliberately focused. The primary evidence is a Tesla
+EV result set for two local Ollama models, \texttt{llama3.1:8b} and
+\texttt{deepseek-r1:8b}, evaluated on a six-feature energy-consumption
+graph-recovery task. This scope makes the work relevant to locally deployed
+and infrastructure-constrained fleet analytics, while keeping the claims
+auditable. The thesis does not treat the models as inferring true causality
+from telemetry alone; it evaluates whether their prompted graph proposals agree
+with a predefined physics-informed reference graph.
+
+\section{Research Objective}
+
+The main research question is:
+
+\begin{quote}
+To what extent do prompt decomposition and structured prompting strategies
+improve LLM-assisted graph recovery from vehicle telematics data when compared
+with simpler prompting baselines?
+\end{quote}
+
+The question is evaluated in a supervised graph-recovery setting. A predicted
+edge set is parsed from each LLM output, converted into an adjacency matrix,
+and compared with a fixed Tesla EV ground-truth matrix. The work does not
+evaluate formal causal identification, repeated-run self-consistency, or
+statistical significance across repeated generations.
+
+The thesis addresses five research questions:
+
+\begin{enumerate}
+  \item \textbf{RQ1:} How accurately can \texttt{llama3.1:8b} and
+  \texttt{deepseek-r1:8b} recover directed relationships between Tesla EV
+  telematics features from a structured dataset summary?
+
+  \item \textbf{RQ2:} How do prompt decomposition strategies, especially
+  least-to-most prompting and skeleton-of-thought prompting, compare with
+  zero-shot and no-instruction baselines on graph-recovery metrics?
+
+  \item \textbf{RQ3:} How does explicit instruction structuring through a
+  policy-first prompt affect precision, recall, false discovery rate, and
+  structural graph error?
+
+  \item \textbf{RQ4:} Which evaluated model-strategy combination achieves the
+  strongest adjacency-matrix recovery against the Tesla EV ground truth?
+
+  \item \textbf{RQ5:} Which correct, spurious, or reversed relationships
+  appear repeatedly across model-strategy outputs, and what do they reveal
+  about LLM failure modes in telematics graph recovery?
+\end{enumerate}
+
+\section{Contribution Statement}
+
+The thesis makes four contributions:
+
+\begin{itemize}
+  \item it defines a reproducible Tesla EV graph-recovery task in which LLM
+  outputs are converted into directed adjacency matrices and evaluated against
+  a fixed ground-truth DAG;
+
+  \item it compares five prompting strategies across two local open-source
+  LLMs, with particular attention to prompt decomposition through
+  least-to-most reasoning and skeleton-of-thought prompting;
+
+  \item it reports graph-recovery performance using an eight-metric evaluation
+  suite: precision, recall, F1 score, structural Hamming distance, false
+  discovery rate, Pearson correlation, Hamming distance, and Frobenius norm;
+
+  \item it analyzes edge-level errors and consensus patterns, showing where
+  LLM-assisted graph proposals recover meaningful telemetry relations and
+  where they produce false positives or direction reversals.
+\end{itemize}
+
+The main empirical finding is that the best observed result is produced by
+\texttt{deepseek-r1:8b} with
+\strategy{Strategy_26_Skeleton_of_Thought}. In the evaluation matrix, this
+combination achieves precision \(0.4444\), recall \(0.6667\), F1 score
+\(0.5333\), structural Hamming distance \(7\), false discovery rate
+\(0.5556\), Pearson correlation \(0.4303\), Hamming distance \(0.1944\), and
+Frobenius norm \(2.6458\). These values support a controlled comparison of
+prompt strategies; they do not support claims of general causal validity,
+statistical significance, or self-consistency improvement.
+
+\section{Overview of Methodology}
+
+The methodology follows a controlled prompt-to-graph evaluation design. The
+Tesla EV dataset is represented through six normalized features:
+\texttt{electricenergyremaining}, \texttt{electricremaining},
+\texttt{speed\_kmh}, \texttt{acceleration\_kmh2}, \texttt{mileage}, and
+\texttt{distance\_m}. A ground-truth directed graph defines six expected
+relationships between these features. Each prompt strategy receives the same
+feature set and dataset fingerprint, asks the model to output directed edges
+in the form \texttt{feature\_a -> feature\_b}, and restricts the final answer
+to machine-parseable relationships.
+
+The generated edge list is parsed into a predicted adjacency matrix and
+compared with the ground-truth adjacency matrix using the eight reported
+metrics. This design keeps the evaluation auditable: every numerical result
+in the results chapter is tied to the saved CSV, JSON, and matrix artifacts
+for the Tesla EV experiment.
+
+\section{Thesis Structure}
+
+Chapter~\ref{sec:background} reviews the literature on LLM prompting,
+structured prompting, prompt decomposition, vehicle telematics analytics, and
+graph-based evaluation. Chapter~\ref{sec:task-definition} defines the Tesla
+EV dataset, graph-recovery task, ground-truth DAG, and scope of the study.
+Chapter~\ref{sec:methodology} presents the methodology, including the
+prompt-to-graph pipeline, parser, metrics, and experimental setup.
+Chapter~\ref{sec:results} reports the evaluation matrix, model-strategy
+comparisons, consensus graph, and edge-level error patterns.
+Chapter~\ref{sec:discussion} interprets the results and discusses threats to
+validity and future work. Chapter~\ref{sec:conclusion} concludes the thesis.

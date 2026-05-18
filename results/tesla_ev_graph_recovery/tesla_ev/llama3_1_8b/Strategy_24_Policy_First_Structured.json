@@ -1,0 +1,54 @@
+{
+  "dataset": "tesla_ev",
+  "model": "llama3.1:8b",
+  "strategy": "Strategy_24_Policy_First_Structured",
+  "kind": "discovery",
+  "features": [
+    "electricenergyremaining",
+    "electricremaining",
+    "speed_kmh",
+    "acceleration_kmh2",
+    "mileage",
+    "distance_m"
+  ],
+  "edges": [
+    [
+      "electricenergyremaining",
+      "speed_kmh"
+    ],
+    [
+      "speed_kmh",
+      "acceleration_kmh2"
+    ],
+    [
+      "acceleration_kmh2",
+      "mileage"
+    ],
+    [
+      "mileage",
+      "distance_m"
+    ],
+    [
+      "distance_m",
+      "electricremaining"
+    ],
+    [
+      "electricenergyremaining",
+      "electricremaining"
+    ]
+  ],
+  "scores": {
+    "Precision": 0.1667,
+    "Recall": 0.1667,
+    "F1 Score": 0.1667,
+    "SHD": 10,
+    "FDR": 0.8333,
+    "Pearson Correlation": 0.0,
+    "Hamming Distance": 0.2778,
+    "Frobenius Norm": 3.1623
+  },
+  "latency_s_total": 2.811,
+  "n_runs": 1,
+  "errors": [],
+  "raw": "Here are the identified directed causal relationships:\n\nelectricenergyremaining -> speed_kmh\nspeed_kmh -> acceleration_kmh2\nacceleration_kmh2 -> mileage\nmileage -> distance_m\ndistance_m -> electricremaining\nelectricenergyremaining -> electricremaining"
+}

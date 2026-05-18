@@ -1,0 +1,181 @@
+\chapter{Discussion}
+\label{sec:discussion}
+
+The results support a cautious but useful interpretation of prompt
+decomposition for telematics graph recovery. The best observed configuration
+is a decomposition-style prompt: \texttt{deepseek-r1:8b} with
+\strategy{Strategy_26_Skeleton_of_Thought}. The broader evidence is not a
+simple story that more structure always helps. Some structured strategies
+produce empty outputs or many false positives, and the consensus graph
+preserves recurring mistakes as well as recurring correct edges.
+
+\section{Answering the Research Questions}
+
+\subsection{RQ1: Model Ability to Recover Directed Relationships}
+
+Both models recover some directed telemetry relationships, but neither
+recovers the six-edge ground truth reliably. The strongest cell recovers four
+of six ground-truth edges and predicts five additional false edges. Llama's
+best cell recovers three of six ground-truth edges and also predicts six false
+edges. These values show that local open-source LLMs can propose useful graph
+fragments, especially for semantically salient energy and motion relations,
+but they do not produce a sufficiently reliable graph without evaluation.
+
+The most consistently recovered true edge is the energy-to-range relationship
+from \texttt{electricenergyremaining} to \texttt{electricremaining}, which
+appears in seven of the ten predicted edge sets. This is unsurprising because
+the feature names strongly suggest a direct relation. Edges that require more
+careful direction or directness judgment are less stable.
+
+\subsection{RQ2: Prompt Decomposition Strategies}
+
+Prompt decomposition has mixed results. Skeleton-of-thought is the strongest
+strategy by mean F1 score across the two models and produces the best single
+cell. Its subsystem-oriented skeleton appears to help DeepSeek connect
+energy-state, driving-behaviour, and cross-group relationships. This is the
+clearest positive evidence for decomposition in the thesis.
+
+Least-to-most prompting does not show the same benefit. DeepSeek's
+least-to-most sidecar contains an empty raw response and no parsed edges,
+while Llama's least-to-most output contains many false positives. This
+suggests that decomposition can fail in two different ways: it can make the
+model fail to produce a parseable answer, or it can encourage a broad list of
+plausible but unsupported links. Decomposition is therefore not a guarantee of
+better graph recovery; it is a design variable that must be validated per
+model and task.
+
+\subsection{RQ3: Instruction Structuring}
+
+Policy-first structured prompting performs weakly in the validated results.
+DeepSeek produces no parseable edges under this strategy, and Llama recovers
+only one true edge while producing five false positives. The policy-first
+prompt is methodologically reasonable because it emphasizes directness,
+interventionability, and output format, but the result shows that explicit
+rules alone are not sufficient. A model can still omit the graph, reverse
+directions, or include plausible non-ground-truth links.
+
+This finding is useful because it counters a common assumption in LLM system
+design: stating a policy before the task does not automatically improve
+output quality. For graph recovery, constraints must be paired with a prompt
+shape that helps the model cover the right feature groups while preserving the
+final edge-list format.
+
+\subsection{RQ4: Strongest Model-Strategy Combination}
+
+The strongest observed combination is \texttt{deepseek-r1:8b} with
+skeleton-of-thought prompting. It achieves F1 score 0.5333, recall 0.6667,
+precision 0.4444, SHD 7, and Pearson correlation 0.4303. This combination
+recovers four of the six ground-truth edges. It is the only row with F1 above
+0.4000.
+
+The result should not be generalized beyond the experiment. It is one output
+from one model under one prompt strategy on one Tesla EV graph. It does,
+however, show that a subsystem-based skeleton can improve graph recovery for
+this specific DeepSeek configuration.
+
+\subsection{RQ5: Recurring Correct and Incorrect Relationships}
+
+The consensus graph shows that repeated agreement across model-strategy cells
+does not equal correctness. The consensus edge
+\texttt{electricenergyremaining -> electricremaining} is correct and has
+support 0.7. The edge \texttt{acceleration\_kmh2 -> speed\_kmh} is also
+correct and has support 0.5. However, the consensus graph also includes
+\texttt{speed\_kmh -> acceleration\_kmh2}, \texttt{mileage -> distance\_m},
+and \texttt{distance\_m -> mileage}, all of which are false under the
+ground-truth DAG.
+
+This pattern shows that the models often identify related feature pairs but
+struggle with direction and directness. In a fleet-monitoring setting, this is
+a serious failure mode: a graph can appear plausible while encoding the wrong
+direction of influence.
+
+\section{Why Skeleton-of-Thought Helped}
+
+The skeleton-of-thought prompt fits the structure of the Tesla EV task. It
+asks the model to consider energy-state edges, driving-behaviour edges, and
+cross-group edges before applying an integrity gate. The ground-truth DAG also
+has this structure: one relationship is within energy state, two involve
+driving behaviour and distance/usage, and two connect driving behaviour to
+remaining energy. This alignment likely explains why DeepSeek with
+skeleton-of-thought recovers the most ground-truth edges.
+
+The same prompt is less successful for Llama. Llama skeleton output contains
+two true positives and seven false positives. The model covers many related
+feature pairs, but it overconnects mileage, distance, and energy variables.
+The prompt therefore appears to improve coverage more than precision for
+Llama. This difference reinforces a central point of the thesis: prompt
+structure interacts with model behavior.
+
+\section{Why Structured Prompts Failed}
+
+Structured prompts fail when they optimize the wrong behavior. A policy-first
+prompt can make the rules explicit but still fail to generate a useful graph.
+A least-to-most prompt can encourage broad causal brainstorming rather than
+strict final edge selection. A skeleton prompt can improve coverage but also
+encourage extra cross-group links. These failures are visible because the
+evaluation parses outputs into matrices and counts false positives, false
+negatives, and structural disagreement.
+
+The DeepSeek empty-output cases are especially important. The sidecar JSON
+files for DeepSeek zero-shot, policy-first, and least-to-most contain empty
+raw responses and zero parsed edges, while reporting no errors. This is a
+pipeline-level fragility: a local model call may complete but still produce no
+usable edge list. Such cells receive low recall and F1, but they also receive
+FDR 0.0000 because no false edges were predicted. This is why FDR must be read
+with recall and F1.
+
+\section{DeepSeek Versus Llama3.1}
+
+DeepSeek is more uneven in the validated artifact set. It produces the
+best graph under skeleton-of-thought and a competitive graph under the
+no-instruction control, but it also produces three empty outputs. Llama is
+more consistent in producing edge lists, but its outputs are dense and
+false-positive heavy. This is reflected in the model averages: Llama has
+higher mean F1, while DeepSeek has lower mean SHD and much lower mean FDR.
+
+This does not support a universal model ranking. It supports a deployment
+lesson: the model that produces the best single graph is not necessarily the
+most dependable across prompt conditions. In a real fleet-monitoring workflow,
+a system designer would need both quality controls for empty outputs and
+filters for false-positive edges.
+
+\section{Consensus Graph Interpretation}
+
+The consensus graph is useful as a diagnostic artifact, not as an empirical
+replacement for the ground truth. It shows which edges are attractive to the
+models across prompt strategies. Some of those edges are correct; others are
+recurring misconceptions. The false consensus edge
+\texttt{speed\_kmh -> acceleration\_kmh2} is particularly instructive because
+it is the reverse of a ground-truth edge. The models appear to treat the two
+signals as tightly related but are inconsistent about causal direction.
+
+The mileage-distance edges show a similar issue. The models frequently link
+\texttt{mileage} and \texttt{distance\_m} in one or both directions, but the
+ground truth encodes speed as the source for both mileage and distance. This
+suggests that models may compress accumulated and short-window distance
+signals into a generic distance relation rather than respecting the specific
+graph definition.
+
+\section{Implications for Fleet Monitoring}
+
+The results support using LLMs as graph proposal tools only when their outputs
+are evaluated. A proposed graph can help analysts inspect possible telemetry
+relationships, but it should not directly drive maintenance decisions,
+diagnostics, or control logic without validation. The value of the pipeline is
+that it turns a free-form LLM output into a measurable artifact.
+
+For fleet-monitoring applications, the practical workflow should therefore be:
+define the feature set, provide a compact data fingerprint, constrain the
+output format, parse the proposed graph, compare it against known or
+expert-reviewed structure, and inspect false positives. Prompt decomposition
+can be useful in this workflow, but it is not a substitute for graph
+validation.
+
+\section{Relation to Earlier Repository Infrastructure}
+
+Earlier repository work remains relevant as engineering context. It
+established data-minimization habits, local inference through Ollama, and
+artifact traceability. In this thesis, those elements support the empirical
+workflow rather than define the central claim. The core result is about graph
+recovery from telematics data, with governance discussed where it affects
+deployment practice.

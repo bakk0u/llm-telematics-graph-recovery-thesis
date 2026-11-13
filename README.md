@@ -3,21 +3,23 @@
   <img src="docs/readme/hero.svg" width="100%" alt="LLM Graph Recovery — Propose the structure. Benchmark every edge.">
 </picture>
 
-<p align="center"><a href="REPRODUCIBILITY.md"><b>Reproduce ↗</b></a> &nbsp; · &nbsp; <a href="#evidence-at-a-glance"><b>Results ↗</b></a> &nbsp; · &nbsp; <a href="CITATION.cff"><b>Citation ↗</b></a></p>
+<p align="center"><a href="REPRODUCIBILITY.md"><b>Reproduce ↗</b></a> &nbsp; · &nbsp; <a href="#results-at-a-glance"><b>Results ↗</b></a> &nbsp; · &nbsp; <a href="CITATION.cff"><b>Citation ↗</b></a></p>
 
-An artifact-based bachelor thesis comparing prompt decomposition strategies for graph recovery from Tesla EV telemetry using Llama 3.1 and DeepSeek-R1.
+My bachelor thesis explores whether language models can recover relationships between vehicle telemetry signals, and how much the prompting strategy changes the result.
 
-## Evidence at a glance
+I compared **Llama 3.1 8B and DeepSeek-R1 8B** across five prompting strategies on **65,261 Tesla EV telemetry records**. This repository contains the thesis, prompts, recorded model outputs and scripts used to check the proposed graphs.
+
+## Results at a glance
 
 | Focus | What this repository contains |
 | :--- | :--- |
-| **2 models × 5 strategies** | Ten validated model–strategy cells. |
+| **2 models × 5 strategies** | Ten model and prompting combinations. |
 | **Best observed F1** | 0.5333 — DeepSeek-R1 with skeleton-of-thought. |
-| **Exploratory scope** | One output per cell; not repeated-run reliability or causal discovery. |
+| **Exploratory scope** | One recorded output per setting; repeated-run stability and causal discovery are not established. |
 
 ## Project preview
 
-![Committed project artifact](figures/f1_strategy_vs_model_tesla_ev.png)
+![F1 scores by model and prompting strategy](figures/f1_strategy_vs_model_tesla_ev.png)
 
 ## How the pieces fit
 
@@ -245,20 +247,6 @@ Use the metadata in `CITATION.cff`, or cite the thesis repository as:
   year   = {2026},
   url    = {https://github.com/bakk0u/llm-telematics-graph-recovery-thesis}
 }
-```
-
-## GitHub Metadata Suggestions
-
-Suggested description:
-
-```text
-Bachelor thesis evaluating prompt decomposition strategies for LLM-based graph recovery from Tesla EV telemetry using local LLMs and adjacency-matrix benchmarking.
-```
-
-Suggested topics:
-
-```text
-llm, prompt-engineering, telematics, graph-recovery, ollama, deepseek, llama3, research, latex, adjacency-matrix
 ```
 
 </details>

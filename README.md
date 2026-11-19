@@ -35,6 +35,8 @@ I compared **Llama 3.1 8B and DeepSeek-R1 8B** across five prompting strategies 
 
 ## Commands
 
+To check the ten recorded results from macOS, Linux or Windows, run `python scripts/validate_results.py` from the repository root.
+
 ### Compile the Thesis
 
 ```bash
